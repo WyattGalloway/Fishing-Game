@@ -1,5 +1,9 @@
 fileFormatVersion: 2
+<<<<<<<< Updated upstream:Fishing Game/Assets/Packages.meta
 guid: e6812c31ab08bd443a174cfc82e5f9df
+========
+guid: 1c793ccf67a8a2f45a1b36d97dbe7c52
+>>>>>>>> Stashed changes:Fishing Game/Assets/Library.meta
 folderAsset: yes
 DefaultImporter:
   externalObjects: {}
