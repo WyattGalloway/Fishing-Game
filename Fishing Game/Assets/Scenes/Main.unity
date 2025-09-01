@@ -456,26 +456,8 @@ MonoBehaviour:
   m_LightCookieSize: {x: 1, y: 1}
   m_LightCookieOffset: {x: 0, y: 0}
   m_SoftShadowQuality: 0
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< Updated upstream
-=======
-<<<<<<< HEAD
->>>>>>> Stashed changes
 --- !u!1 &462903405
-=======
 --- !u!1 &517766687
->>>>>>> 593b3cbbda690dfbf2a794fab507c3a2883c2abc
-<<<<<<< Updated upstream
-=======
-=======
---- !u!1 &517766687
->>>>>>> 593b3cbbda690dfbf2a794fab507c3a2883c2abc
->>>>>>> Stashed changes
-=======
---- !u!1 &517766687
->>>>>>> 593b3cbbda690dfbf2a794fab507c3a2883c2abc
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -483,12 +465,6 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< Updated upstream
-=======
-<<<<<<< HEAD
->>>>>>> Stashed changes
   - component: {fileID: 462903406}
   - component: {fileID: 462903409}
   - component: {fileID: 462903408}
@@ -496,48 +472,17 @@ GameObject:
   - component: {fileID: 462903410}
   m_Layer: 0
   m_Name: Capsule
-=======
-<<<<<<< Updated upstream
-=======
-=======
->>>>>>> 593b3cbbda690dfbf2a794fab507c3a2883c2abc
->>>>>>> Stashed changes
-=======
->>>>>>> 593b3cbbda690dfbf2a794fab507c3a2883c2abc
   - component: {fileID: 517766690}
   - component: {fileID: 517766689}
   - component: {fileID: 517766688}
   m_Layer: 0
   m_Name: EventSystem
-<<<<<<< HEAD
-<<<<<<< Updated upstream
-=======
-<<<<<<< HEAD
->>>>>>> 593b3cbbda690dfbf2a794fab507c3a2883c2abc
-=======
->>>>>>> Stashed changes
->>>>>>> 593b3cbbda690dfbf2a794fab507c3a2883c2abc
-=======
->>>>>>> 593b3cbbda690dfbf2a794fab507c3a2883c2abc
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< Updated upstream
 --- !u!4 &462903406
-=======
-=======
-<<<<<<< HEAD
---- !u!4 &462903406
-=======
-=======
->>>>>>> 593b3cbbda690dfbf2a794fab507c3a2883c2abc
->>>>>>> Stashed changes
-=======
->>>>>>> 593b3cbbda690dfbf2a794fab507c3a2883c2abc
 --- !u!114 &517766688
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -585,58 +530,27 @@ MonoBehaviour:
   m_sendNavigationEvents: 1
   m_DragThreshold: 10
 --- !u!4 &517766690
-<<<<<<< HEAD
-<<<<<<< Updated upstream
-=======
-<<<<<<< HEAD
->>>>>>> 593b3cbbda690dfbf2a794fab507c3a2883c2abc
-=======
->>>>>>> Stashed changes
->>>>>>> 593b3cbbda690dfbf2a794fab507c3a2883c2abc
-=======
->>>>>>> 593b3cbbda690dfbf2a794fab507c3a2883c2abc
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< Updated upstream
-=======
-<<<<<<< HEAD
->>>>>>> Stashed changes
   m_GameObject: {fileID: 462903405}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-=======
   m_GameObject: {fileID: 517766687}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
->>>>>>> 593b3cbbda690dfbf2a794fab507c3a2883c2abc
-<<<<<<< Updated upstream
-=======
-=======
   m_GameObject: {fileID: 517766687}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
->>>>>>> 593b3cbbda690dfbf2a794fab507c3a2883c2abc
->>>>>>> Stashed changes
-=======
   m_GameObject: {fileID: 517766687}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
->>>>>>> 593b3cbbda690dfbf2a794fab507c3a2883c2abc
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< Updated upstream
-=======
-<<<<<<< HEAD
->>>>>>> Stashed changes
   m_Father: {fileID: 1205150555}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!136 &462903407
@@ -715,8 +629,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 462903405}
   m_Mesh: {fileID: 10208, guid: 0000000000000000e000000000000000, type: 0}
-<<<<<<< Updated upstream
-=======
 --- !u!54 &462903410
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -744,21 +656,12 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
-=======
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
->>>>>>> 593b3cbbda690dfbf2a794fab507c3a2883c2abc
->>>>>>> Stashed changes
-=======
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
->>>>>>> 593b3cbbda690dfbf2a794fab507c3a2883c2abc
-=======
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
->>>>>>> 593b3cbbda690dfbf2a794fab507c3a2883c2abc
-=======
->>>>>>> parent of 9656f6d (Cinemachine)
 --- !u!1 &582877564
 GameObject:
   m_ObjectHideFlags: 0
@@ -1220,21 +1123,7 @@ MonoBehaviour:
     m_MipBias: 0
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< Updated upstream
 --- !u!114 &1414436238
-=======
-=======
-<<<<<<< HEAD
---- !u!114 &1414436238
-=======
-=======
->>>>>>> 593b3cbbda690dfbf2a794fab507c3a2883c2abc
->>>>>>> Stashed changes
-=======
->>>>>>> 593b3cbbda690dfbf2a794fab507c3a2883c2abc
 --- !u!1 &1569351848
 GameObject:
   m_ObjectHideFlags: 0
@@ -1275,27 +1164,11 @@ RectTransform:
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1569351850
-<<<<<<< HEAD
-<<<<<<< Updated upstream
-=======
-<<<<<<< HEAD
->>>>>>> 593b3cbbda690dfbf2a794fab507c3a2883c2abc
-=======
->>>>>>> Stashed changes
->>>>>>> 593b3cbbda690dfbf2a794fab507c3a2883c2abc
-=======
->>>>>>> 593b3cbbda690dfbf2a794fab507c3a2883c2abc
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< Updated upstream
-=======
-<<<<<<< HEAD
->>>>>>> Stashed changes
   m_GameObject: {fileID: 1414436233}
   m_Enabled: 1
   m_EditorHideFlags: 0
@@ -1322,14 +1195,6 @@ MonoBehaviour:
       m_PostInfinity: 2
       m_RotationOrder: 4
   CustomBlends: {fileID: 0}
-=======
-<<<<<<< Updated upstream
-=======
-=======
->>>>>>> 593b3cbbda690dfbf2a794fab507c3a2883c2abc
->>>>>>> Stashed changes
-=======
->>>>>>> 593b3cbbda690dfbf2a794fab507c3a2883c2abc
   m_GameObject: {fileID: 1569351848}
   m_Enabled: 1
   m_EditorHideFlags: 0
@@ -1375,18 +1240,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1569351848}
   m_CullTransparentMesh: 1
-<<<<<<< HEAD
-<<<<<<< Updated upstream
-=======
-<<<<<<< HEAD
->>>>>>> 593b3cbbda690dfbf2a794fab507c3a2883c2abc
-=======
->>>>>>> Stashed changes
->>>>>>> 593b3cbbda690dfbf2a794fab507c3a2883c2abc
-=======
->>>>>>> 593b3cbbda690dfbf2a794fab507c3a2883c2abc
-=======
->>>>>>> parent of 9656f6d (Cinemachine)
 --- !u!1 &1684802805
 GameObject:
   m_ObjectHideFlags: 0
@@ -1649,27 +1502,12 @@ SceneRoots:
   - {fileID: 1951337428}
   - {fileID: 1684802806}
   - {fileID: 219804567}
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< Updated upstream
   - {fileID: 1205150555}
   - {fileID: 1408777104}
-=======
-<<<<<<< HEAD
   - {fileID: 1205150555}
-=======
   - {fileID: 91770743}
   - {fileID: 517766690}
->>>>>>> 593b3cbbda690dfbf2a794fab507c3a2883c2abc
->>>>>>> Stashed changes
-=======
   - {fileID: 91770743}
   - {fileID: 517766690}
->>>>>>> 593b3cbbda690dfbf2a794fab507c3a2883c2abc
-=======
   - {fileID: 91770743}
   - {fileID: 517766690}
->>>>>>> 593b3cbbda690dfbf2a794fab507c3a2883c2abc
-=======
->>>>>>> parent of 9656f6d (Cinemachine)
