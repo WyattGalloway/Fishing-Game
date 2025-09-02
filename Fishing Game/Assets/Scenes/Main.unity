@@ -488,7 +488,6 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 542756136}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.35355338, y: 0.35355338, z: -0.1464466, w: 0.8535534}
   m_LocalPosition: {x: 0, y: -0.55, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -1387,8 +1386,6 @@ GameObject:
   - component: {fileID: 2011997794}
   - component: {fileID: 2011997792}
   - component: {fileID: 2011997792}
-  - component: {fileID: 2011997793}
-  - component: {fileID: 2011997792}
   m_Layer: 0
   m_Name: Boat
   m_TagString: Untagged
@@ -1498,9 +1495,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c4b2b8905e8e52042a40a8acbb9f91fe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  turnSpeed: 120
-  moveSpeed: 10
-  rb: {fileID: 2011997793}
   moveSpeed: 20
 --- !u!114 &2011997792
 MonoBehaviour:
