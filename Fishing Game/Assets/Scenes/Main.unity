@@ -595,12 +595,10 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 542756136}
   serializedVersion: 2
-<<<<<<< HEAD
   m_LocalRotation: {x: 0.35355338, y: 0.35355338, z: -0.1464466, w: 0.8535534}
   m_LocalRotation: {x: -0, y: -0.38394776, z: -0, w: 0.9233548}
-=======
   m_LocalRotation: {x: -0, y: 0.38268343, z: -0, w: 0.92387956}
->>>>>>> parent of 0e83a81 (Did too much should've broken it up)
+  m_LocalRotation: {x: -0, y: 0.38268343, z: -0, w: 0.92387956}
   m_LocalPosition: {x: 0, y: -0.55, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -1515,14 +1513,12 @@ GameObject:
   - component: {fileID: 2011997788}
   - component: {fileID: 2011997787}
   - component: {fileID: 2011997791}
-<<<<<<< HEAD
   - component: {fileID: 2011997794}
-  - component: {fileID: 2011997791}
   - component: {fileID: 2011997792}
-=======
   - component: {fileID: 2011997792}
   - component: {fileID: 2011997793}
->>>>>>> parent of 0e83a81 (Did too much should've broken it up)
+  - component: {fileID: 2011997792}
+  - component: {fileID: 2011997793}
   m_Layer: 0
   m_Name: Boat
   m_TagString: Untagged
