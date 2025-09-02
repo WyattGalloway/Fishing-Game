@@ -180,6 +180,7 @@ MonoBehaviour:
   mainCam: {fileID: 1414436235}
   staminaCanvas: {fileID: 542756136}
   refillSpeed: 0.1
+  usageAmont: 0
   useStamina:
     m_Name: Use Stamina
     m_Type: 0
@@ -280,9 +281,9 @@ MonoBehaviour:
   TargetOffset: {x: 0, y: 0, z: 0}
   Damping: {x: 1, y: 1, z: 1}
   Lookahead:
-    Enabled: 0
-    Time: 0
-    Smoothing: 0
+    Enabled: 1
+    Time: 0.129
+    Smoothing: 8.4
     IgnoreY: 0
 --- !u!114 &259430696
 MonoBehaviour:
@@ -595,7 +596,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 542756136}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: 0.38268343, z: -0, w: 0.92387956}
+  m_LocalRotation: {x: 0.35355338, y: 0.35355338, z: -0.1464466, w: 0.8535534}
   m_LocalPosition: {x: 0, y: -0.55, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -1002,6 +1003,50 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1185884582}
   m_CullTransparentMesh: 1
+--- !u!1 &1277260820
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1277260822}
+  - component: {fileID: 1277260821}
+  m_Layer: 0
+  m_Name: FishManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1277260821
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1277260820}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 291d3d7d275309d45ad39ebd6a3c2baa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &1277260822
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1277260820}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 37.48602, y: 0, z: 36.08351}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1414436233
 GameObject:
   m_ObjectHideFlags: 0
@@ -1015,6 +1060,7 @@ GameObject:
   - component: {fileID: 1414436234}
   - component: {fileID: 1414436237}
   - component: {fileID: 1414436238}
+  - component: {fileID: 1414436239}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -1172,6 +1218,19 @@ MonoBehaviour:
       m_PostInfinity: 2
       m_RotationOrder: 4
   CustomBlends: {fileID: 0}
+--- !u!114 &1414436239
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1414436233}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b0e8a1410d7574d4f896c325870e41c9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  target: {fileID: 2011997790}
 --- !u!1 &1557438473
 GameObject:
   m_ObjectHideFlags: 0
@@ -1509,9 +1568,10 @@ GameObject:
   - component: {fileID: 2011997789}
   - component: {fileID: 2011997788}
   - component: {fileID: 2011997787}
-  - component: {fileID: 2011997791}
-  - component: {fileID: 2011997792}
   - component: {fileID: 2011997793}
+  - component: {fileID: 2011997792}
+  - component: {fileID: 2011997791}
+  - component: {fileID: 2011997794}
   m_Layer: 0
   m_Name: Boat
   m_TagString: Untagged
@@ -1618,11 +1678,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 2011997786}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c4b2b8905e8e52042a40a8acbb9f91fe, type: 3}
+  m_Script: {fileID: 11500000, guid: bf37d225d4099284a9f6b958348a3c5a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  turnSpeed: 120
-  moveSpeed: 10
+  turnSpeed: 60
+  moveSpeed: 25
   rb: {fileID: 2011997793}
 --- !u!114 &2011997792
 MonoBehaviour:
@@ -1662,7 +1722,7 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2011997786}
   serializedVersion: 5
-  m_Mass: 1
+  m_Mass: 10
   m_LinearDamping: 0
   m_AngularDamping: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
@@ -1681,6 +1741,41 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &2011997794
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2011997786}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e985bccba70ac654d9fe912df1dff1a2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  casting:
+    m_Name: Casting
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: 973f5f2f-fc6f-40b3-b871-e0901fdf9f05
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings:
+    - m_Name: 
+      m_Id: 27c35caa-a967-42d3-b032-c78f952d77a6
+      m_Path: <Keyboard>/q
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Casting
+      m_Flags: 0
+    m_Flags: 0
+  castChargeAmount: 0
+  maxCastChargeAmount: 10
+  netRb: {fileID: 4120755108144708744, guid: 942786af3bbd0884ca1009a3901dba8c, type: 3}
+  netPrefab: {fileID: 4390782343146088208, guid: 942786af3bbd0884ca1009a3901dba8c, type: 3}
+  staminaBar: {fileID: 214369014}
+  maxNets: 15
 --- !u!1 &2117272787
 GameObject:
   m_ObjectHideFlags: 0
@@ -1912,3 +2007,4 @@ SceneRoots:
   - {fileID: 1951337428}
   - {fileID: 1684802806}
   - {fileID: 1787254936}
+  - {fileID: 1277260822}

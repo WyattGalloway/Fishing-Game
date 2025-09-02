@@ -1,34 +1,104 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class NetCast : MonoBehaviour
 {
-    public GameObject netPrefab;
-    public float castDistance;
+    [Header("Input Mapping")]
+    PlayerInput playerInput;
+    public InputAction casting;
+    float castInput;
 
-    PlayerInputs playerInput;
+    [Header("Cast Parameters")]
+    [SerializeField] float castChargeAmount;
+    [SerializeField] float maxCastChargeAmount = 10f;
 
-    void Awake()
-    {
-        playerInput = new PlayerInputs();
+    [Header("Reference Variables")]
+    [SerializeField] Rigidbody netRb;
+    [SerializeField] GameObject netPrefab;
+    [SerializeField] StaminaBar staminaBar;
 
-        playerInput.Gameplay.CastLeft.performed += ctx => CastNet(-transform.right);
-        playerInput.Gameplay.CastRight.performed += ctx => CastNet(transform.right);
-    }
+    [Header("Casting Logic Operators")]
+    float castDistance;
+    float chargeRate = 1f;
+    bool isCharging;
+
+    [Header("Net Limits")]
+    [SerializeField] int maxNets;
+    List<GameObject> activeNets = new List<GameObject>();
 
     void OnEnable()
     {
-        playerInput.Enable();
+        casting.Enable();
+        casting.started += OnCastStarted;
+        casting.canceled += OnCastReleased;
     }
 
     void OnDisable()
     {
-        playerInput.Disable();
+        casting.Disable();
+        casting.started -= OnCastStarted;
+        casting.canceled -= OnCastReleased;
     }
 
-    void CastNet(Vector3 direction)
+    void Update()
     {
-        Vector3 spawnPosition = transform.position + direction * castDistance;
-        Instantiate(netPrefab, spawnPosition, Quaternion.identity);
+        if (isCharging)
+        {
+            castChargeAmount += chargeRate;
+            StartCoroutine(StaminaUpdate());
+            castChargeAmount = Mathf.Min(castChargeAmount, maxCastChargeAmount);
+        }
     }
+
+    void OnCastStarted(InputAction.CallbackContext callbackContext)
+    {
+        isCharging = true;
+        castChargeAmount = 0f;
+    }
+
+    void OnCastReleased(InputAction.CallbackContext callbackContext)
+    {
+        isCharging = false;
+        if (staminaBar.current > castChargeAmount) CastNet();
+    }
+
+    void CastNet()
+    {
+        //spawn net in front of ship
+        Vector3 netSpawnPosition = transform.position + new Vector3(transform.forward.x, 1, transform.forward.z);
+        GameObject netInstance = Instantiate(netPrefab, netSpawnPosition, Quaternion.identity);
+
+        netRb = netInstance.GetComponent<Rigidbody>();
+        activeNets.Add(netInstance);
+
+        if (netRb != null)
+        {
+            Vector3 throwDirection = transform.forward + Vector3.up;
+            netRb.AddForce(throwDirection * castChargeAmount, ForceMode.Impulse);
+        }
+
+        //destroy new nets if there are more than are allowed
+        if (activeNets.Count > maxNets)
+        {
+            activeNets.Remove(netInstance);
+            Destroy(netInstance);
+        }
+
+        castChargeAmount = 0f;
+    }
+
+    IEnumerator StaminaUpdate()
+    {
+        while (castChargeAmount < maxCastChargeAmount && activeNets.Count < maxNets)
+        {
+            staminaBar.UseStamina(chargeRate);
+            break;
+        }
+
+        yield return null;
+
+    }
+
 }
