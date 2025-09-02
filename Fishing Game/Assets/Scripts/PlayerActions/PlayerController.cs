@@ -3,56 +3,47 @@ using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
-    PlayerInputs playerInput;
+    PlayerInput playerInput;
     InputAction movement;
 
-    [SerializeField] InputActionReference move;
-
+    [SerializeField] float turnSpeed = 30f;
     [SerializeField] float moveSpeed;
-    [SerializeField] float rotationSpeed;
+    [SerializeField] Rigidbody rb;
 
-    Vector2 moveInput;
-    Vector2 rotateInput;
+    private float forwardInput;
+    private float turnInput;
 
-    void Awake()
+    void Start()
     {
-        playerInput = new PlayerInputs();
-        playerInput.Movement.Move.performed += ctx => moveInput = ctx.ReadValue<Vector2>();
-        playerInput.Rotate.Rotate.performed += ctx => rotateInput = ctx.ReadValue<Vector2>();
+        playerInput = GetComponent<PlayerInput>();
+        movement = playerInput.actions.FindAction("Move");
+    }
+    private void Update()
+    {
+        GatherInput();
+    }
+    void FixedUpdate()
+    {
+        MovePlayer();
     }
 
-    void OnEnable()
+    void GatherInput()
     {
-        playerInput.Enable();
-
+        Vector2 direction = movement.ReadValue<Vector2>();
+        transform.position += new Vector3(direction.x, 0, direction.y) * moveSpeed * Time.deltaTime;
+        forwardInput = direction.y;
+        turnInput = direction.x;
     }
 
-    void OnDisable()
+    void MovePlayer()
     {
-        playerInput.Disable();
-    }
+        float rotation = turnInput * turnSpeed * Time.fixedDeltaTime;
+        Quaternion turnOffset = Quaternion.Euler(0, rotation, 0);
+        rb.MoveRotation((rb.rotation * turnOffset));
 
-    void Update()
-    {
-        Vector3 movement = transform.forward * moveInput.y + transform.right * moveInput.x;
-        transform.position += movement * moveSpeed * Time.deltaTime;
+        Vector3 forwardMove = transform.forward * forwardInput * moveSpeed * Time.fixedDeltaTime;
+        rb.MovePosition(rb.position + forwardMove);
 
-        transform.Rotate(Vector3.up, rotateInput.x * rotationSpeed * Time.deltaTime);
-    }
 
-    void MovePlayer(InputAction.CallbackContext context)
-    {
-        Vector3 forward = transform.forward * moveInput.y;
-        Vector3 right = transform.right * moveInput.x;
-        Vector3 movement = forward + right;
-
-        transform.Translate(movement * moveSpeed * Time.deltaTime);
-    }
-
-    void RotatePlayer(InputAction.CallbackContext context)
-    {
-        float rotationAmount = rotateInput.x * 1f;
-
-        transform.Rotate(Vector3.up, rotationAmount * Time.deltaTime);
     }
 }
