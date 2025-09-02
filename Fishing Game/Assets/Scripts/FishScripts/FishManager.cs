@@ -26,18 +26,19 @@ public class FishManager : MonoBehaviour
 
     }
 
-    public Fish RandomFish()
+    public Fish CatchRandomFish()
     {
-        if (fishList.Count == 0) return null;
+        Fish newFish = FishLibrary.GetRandomFish();
+        fishList.Add(newFish);
+        return newFish;
+    }
 
-        float totalWeight = 0;
+    public List<Fish> GetCaughtFish => fishList;
 
-        for (int i = 0; i < fishList.Count; i++)
-        {
-            totalWeight += fishList[i].weight;
-        }
-
-        return fishList[0];
+    public void PringCaughtFish()
+    {
+        foreach (Fish fish in fishList)
+            Debug.Log($"{fish.name} - {fish.weight} lbs");
     }
 
     

@@ -8,6 +8,7 @@ public class NetBehaviour : MonoBehaviour
 {
     [SerializeField] GameObject indicator;
     [SerializeField] Sprite caughtSprite;
+    [SerializeField] LayerMask waterLayer;
 
     [SerializeField] Image indicatorSprite;
 
@@ -15,6 +16,7 @@ public class NetBehaviour : MonoBehaviour
     Coroutine fishingCoroutine;
 
     bool isOnWater;
+    bool isFishing;
 
     void Start()
     {
@@ -29,11 +31,12 @@ public class NetBehaviour : MonoBehaviour
     {
         bool currentlyOnWater = CheckIfOnWater();
 
-        if (currentlyOnWater && !isOnWater)
+        if (currentlyOnWater && !isOnWater && !isFishing)
         {
             indicator.SetActive(true);
             float waitTime = Random.Range(2f, 10f);
             fishingCoroutine = StartCoroutine(FishingTimer(waitTime));
+            isFishing = true;
         }
         else if (!currentlyOnWater && isOnWater)
         {
@@ -44,6 +47,8 @@ public class NetBehaviour : MonoBehaviour
                 StopCoroutine(fishingCoroutine);
                 fishingCoroutine = null;
             }
+
+            isFishing = false;
         }
 
         isOnWater = currentlyOnWater;
@@ -51,7 +56,8 @@ public class NetBehaviour : MonoBehaviour
 
     bool CheckIfOnWater()
     {
-        return Physics.Raycast(transform.position, Vector3.down, 1f);
+        Debug.DrawRay(transform.position, Vector3.down * 1f, Color.red);
+        return Physics.Raycast(transform.position, Vector3.down, 1f, waterLayer);
     }
 
     IEnumerator FishingTimer(float time)
@@ -59,16 +65,11 @@ public class NetBehaviour : MonoBehaviour
         Debug.Log($"Waiting {time} seconds to catch a fish...");
         yield return new WaitForSeconds(time);
 
-        if (fishList != null && fishList.Count > 0)
+        Fish caughtFish = FishingManager.Instance.TryCatchFish();
+
+        if (caughtFish != null)
         {
             indicatorSprite.sprite = caughtSprite;
-            Fish caughtFish = FishManager.Instance.RandomFish();
-            Debug.Log($"Caught a {caughtFish.name} weighing {caughtFish.weight} kg!");
-            fishList.Remove(caughtFish);
-        }
-        else
-        {
-            Debug.Log("No Fish to Catch");
         }
     }
 }

@@ -227,6 +227,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   indicator: {fileID: 8653689423944230465}
   caughtSprite: {fileID: 21300000, guid: 457f2523c54ef054b94c75fc2c0c157e, type: 3}
+  waterLayer:
+    serializedVersion: 2
+    m_Bits: 16
   indicatorSprite: {fileID: 336056993370265713}
 --- !u!1 &4698664332386142137
 GameObject:
