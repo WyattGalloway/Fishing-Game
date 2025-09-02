@@ -3,15 +3,13 @@ using UnityEngine;
 
 public class Indicator : MonoBehaviour
 {
-
-    [SerializeField] Canvas indicatorCanvas;
-    Camera mainCam;
-    float initialY;
+    Coroutine movementRoutine;
+    Vector3 startPosition;
+    Vector3 endPosition;
 
     void Start()
     {
-        mainCam = Camera.main;
-        initialY = transform.position.y;
+
     }
 
     void Update()
@@ -19,17 +17,9 @@ public class Indicator : MonoBehaviour
         MoveIndicator();
     }
 
-    void LateUpdate()
-    {
-        if (mainCam != null) //stamina bar will always face camera
-        {
-            indicatorCanvas.transform.forward = mainCam.transform.forward;
-        }
-    }
-
     void MoveIndicator()
     {
-        float yOffset = Mathf.Sin(Time.time * 2f) * 0.1f;
-        transform.position = new Vector3(transform.position.x, initialY + yOffset, transform.position.z);
+        float originalY = transform.position.y;
+        transform.position = new Vector3(transform.position.x, Mathf.Sin(Time.time * 5f) * 0.1f + originalY, transform.position.z);
     }
 }

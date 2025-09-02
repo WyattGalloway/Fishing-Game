@@ -18,7 +18,6 @@ public class StaminaBar : ProgressBarBase
     bool isRefilling;
 
     [SerializeField] float refillSpeed;
-    public float usageAmont;
 
     public InputAction useStamina;
 
@@ -43,7 +42,7 @@ public class StaminaBar : ProgressBarBase
 
         if (useStamina.ReadValue<float>() > 0) //if button is held down or pressed
         {
-            UseStamina(usageAmont);
+            UseStamina(0.25f);
         }
 
         StartCoroutine(ChangeColorOverTime());
@@ -53,11 +52,15 @@ public class StaminaBar : ProgressBarBase
     {
         if (mainCam != null) //stamina bar will always face camera
         {
-            staminaCanvas.transform.forward = mainCam.transform.forward;
+            Vector3 direction = staminaCanvas.transform.position - mainCam.transform.position;
+            direction.y = 0f;
+
+            Quaternion lookRotation = Quaternion.LookRotation(direction);
+            staminaCanvas.transform.rotation = lookRotation;
         }
     }
 
-    public void UseStamina(float useAmount)
+    void UseStamina(float useAmount)
     {
         current -= useAmount;
         current = Mathf.Max(0, current);
