@@ -597,6 +597,7 @@ Transform:
   m_GameObject: {fileID: 542756136}
   serializedVersion: 2
   m_LocalRotation: {x: 0.35355338, y: 0.35355338, z: -0.1464466, w: 0.8535534}
+  m_LocalRotation: {x: -0, y: -0.38394776, z: -0, w: 0.9233548}
   m_LocalPosition: {x: 0, y: -0.55, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -1109,8 +1110,8 @@ Camera:
     height: 1
   near clip plane: 0.01
   far clip plane: 1000
-  field of view: 60.000004
-  orthographic: 1
+  field of view: 9.6
+  orthographic: 0
   orthographic size: 13.2
   m_Depth: -1
   m_CullingMask:
@@ -1135,13 +1136,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1414436233}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.35355338, y: 0.35355338, z: -0.1464466, w: 0.8535535}
-  m_LocalPosition: {x: -10.482399, y: 14.742135, z: -9.451}
+  m_LocalRotation: {x: 0.23911765, y: -0.3696438, z: 0.09904577, w: 0.89239913}
+  m_LocalPosition: {x: 97.2, y: 81.6, z: -96.6}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 30, y: 45, z: 0}
+  m_LocalEulerAnglesHint: {x: 30, y: -45, z: 0}
 --- !u!114 &1414436237
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1195,7 +1196,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1414436233}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 72ece51f2901e7445ab60da3685d6b5f, type: 3}
+  m_Script: {fileID: 11500000, guid: b0e8a1410d7574d4f896c325870e41c9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   ShowDebugText: 0
@@ -1572,6 +1573,8 @@ GameObject:
   - component: {fileID: 2011997792}
   - component: {fileID: 2011997791}
   - component: {fileID: 2011997794}
+  - component: {fileID: 2011997791}
+  - component: {fileID: 2011997792}
   m_Layer: 0
   m_Name: Boat
   m_TagString: Untagged
@@ -1684,6 +1687,7 @@ MonoBehaviour:
   turnSpeed: 60
   moveSpeed: 25
   rb: {fileID: 2011997793}
+  moveSpeed: 20
 --- !u!114 &2011997792
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2000,7 +2004,6 @@ SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 1414436236}
-  - {fileID: 259430697}
   - {fileID: 405310034}
   - {fileID: 2117272789}
   - {fileID: 2011997790}
