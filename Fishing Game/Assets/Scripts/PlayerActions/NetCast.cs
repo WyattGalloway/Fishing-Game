@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -22,6 +23,7 @@ public class NetCast : MonoBehaviour
     [Header("Casting Logic Operators")]
     float castDistance;
     float chargeRate = 1f;
+    public float sumChargeRate;
     bool isCharging;
 
     [Header("Net Limits")]
@@ -47,7 +49,6 @@ public class NetCast : MonoBehaviour
         if (isCharging)
         {
             castChargeAmount += chargeRate;
-            StartCoroutine(StaminaUpdate());
             castChargeAmount = Mathf.Min(castChargeAmount, maxCastChargeAmount);
         }
     }
@@ -61,29 +62,37 @@ public class NetCast : MonoBehaviour
     void OnCastReleased(InputAction.CallbackContext callbackContext)
     {
         isCharging = false;
+
         if (staminaBar.current > castChargeAmount) CastNet();
+        else Debug.Log("Not enough stamina to cast");
     }
 
     void CastNet()
     {
-        //spawn net in front of ship
-        Vector3 netSpawnPosition = transform.position + new Vector3(transform.forward.x, 1, transform.forward.z);
-        GameObject netInstance = Instantiate(netPrefab, netSpawnPosition, Quaternion.identity);
-
-        netRb = netInstance.GetComponent<Rigidbody>();
-        activeNets.Add(netInstance);
-
-        if (netRb != null)
+        if (castChargeAmount < staminaBar.current)
         {
-            Vector3 throwDirection = transform.forward + Vector3.up;
-            netRb.AddForce(throwDirection * castChargeAmount, ForceMode.Impulse);
-        }
+            //spawn net in front of ship
+            Vector3 netSpawnPosition = transform.position + new Vector3(transform.forward.x, 1, transform.forward.z);
+            GameObject netInstance = Instantiate(netPrefab, netSpawnPosition, Quaternion.identity);
 
-        //destroy new nets if there are more than are allowed
-        if (activeNets.Count > maxNets)
-        {
-            activeNets.Remove(netInstance);
-            Destroy(netInstance);
+            netRb = netInstance.GetComponent<Rigidbody>();
+            activeNets.Add(netInstance);
+
+
+            if (netRb != null)
+            {
+                Vector3 throwDirection = transform.forward + Vector3.up;
+                netRb.AddForce(throwDirection * castChargeAmount, ForceMode.Impulse);
+            }
+
+            //destroy new nets if there are more than are allowed
+            if (activeNets.Count > maxNets)
+            {
+                activeNets.Remove(netInstance);
+                Destroy(netInstance);
+            }
+
+            StartCoroutine(StaminaUpdate());
         }
 
         castChargeAmount = 0f;
@@ -91,9 +100,9 @@ public class NetCast : MonoBehaviour
 
     IEnumerator StaminaUpdate()
     {
-        while (castChargeAmount < maxCastChargeAmount && activeNets.Count < maxNets)
+        while (castChargeAmount <= maxCastChargeAmount && activeNets.Count <= maxNets && castChargeAmount < staminaBar.current)
         {
-            staminaBar.UseStamina(chargeRate);
+            staminaBar.UseStamina(castChargeAmount);
             break;
         }
 

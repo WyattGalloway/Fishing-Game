@@ -1722,7 +1722,7 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2011997786}
   serializedVersion: 5
-  m_Mass: 10
+  m_Mass: 100
   m_LinearDamping: 0
   m_AngularDamping: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
@@ -1775,7 +1775,8 @@ MonoBehaviour:
   netRb: {fileID: 4120755108144708744, guid: 942786af3bbd0884ca1009a3901dba8c, type: 3}
   netPrefab: {fileID: 4390782343146088208, guid: 942786af3bbd0884ca1009a3901dba8c, type: 3}
   staminaBar: {fileID: 214369014}
-  maxNets: 15
+  sumChargeRate: 0
+  maxNets: 30
 --- !u!1 &2117272787
 GameObject:
   m_ObjectHideFlags: 0
