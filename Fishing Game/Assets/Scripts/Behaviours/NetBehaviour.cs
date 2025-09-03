@@ -6,20 +6,25 @@ using UnityEngine.UI;
 
 public class NetBehaviour : MonoBehaviour
 {
+    [Header("References")]
     [SerializeField] GameObject indicator;
     [SerializeField] Sprite caughtSprite;
     [SerializeField] LayerMask waterLayer;
-
     [SerializeField] Image indicatorSprite;
 
+    [Header("Fish Logic")]
     List<Fish> fishList;
     Coroutine fishingCoroutine;
 
     bool isOnWater;
     bool isFishing;
 
+    Rigidbody rb;
+
     void Start()
     {
+        rb = GetComponent<Rigidbody>();
+
         if (FishManager.Instance != null)
         {
             fishList = FishManager.Instance.fishList;
@@ -70,6 +75,9 @@ public class NetBehaviour : MonoBehaviour
         if (caughtFish != null)
         {
             indicatorSprite.sprite = caughtSprite;
+            rb.mass += caughtFish.weight;
         }
+
+
     }
 }

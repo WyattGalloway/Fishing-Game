@@ -10,22 +10,12 @@ public class FishManager : MonoBehaviour
 
     void Awake()
     {
-        if (Instance == null)
-        {
-            Instance = this;
-        }
-        else if (Instance != this)
-        {
-            Destroy(gameObject);
-        }
-
-        if (fishList.Count == 0)
-        {
-            fishList.Add(new Fish("Salmon", Random.Range(2, 4)));
-        }
-
+        //Singleton
+        if (Instance == null) Instance = this;
+        else if (Instance != this) Destroy(gameObject);
     }
 
+    //Gets a random fish from the fish library
     public Fish CatchRandomFish()
     {
         Fish newFish = FishLibrary.GetRandomFish();
@@ -33,9 +23,11 @@ public class FishManager : MonoBehaviour
         return newFish;
     }
 
+    //adds whatever fish was caught to a new list for caught fish
     public List<Fish> GetCaughtFish => fishList;
 
-    public void PringCaughtFish()
+    //prints the name and weight of the caught fish
+    public void PrintCaughtFish()
     {
         foreach (Fish fish in fishList)
             Debug.Log($"{fish.name} - {fish.weight} lbs");

@@ -78,6 +78,8 @@ public class NetCast : MonoBehaviour
             netRb = netInstance.GetComponent<Rigidbody>();
             activeNets.Add(netInstance);
 
+            CameraManager.Instance.cameraTarget = netInstance.transform;
+
 
             if (netRb != null)
             {
@@ -92,8 +94,15 @@ public class NetCast : MonoBehaviour
                 Destroy(netInstance);
             }
 
+            if (CameraManager.Instance != null)
+            {
+                CameraManager.Instance.FocusBetweenPlayerAndTarget(netInstance.transform.position);
+            }
+
             StartCoroutine(StaminaUpdate());
         }
+
+
 
         castChargeAmount = 0f;
     }
