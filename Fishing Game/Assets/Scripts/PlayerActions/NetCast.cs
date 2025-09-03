@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -15,20 +16,36 @@ public class NetCast : MonoBehaviour
     [SerializeField] float castChargeAmount;
     [SerializeField] float maxCastChargeAmount = 10f;
 
+    [Header("Pull Parameters")]
+    [SerializeField] float pullStaminaCost;
+    [SerializeField] float pullIncrement;
+
     [Header("Reference Variables")]
     [SerializeField] Rigidbody netRb;
     [SerializeField] GameObject netPrefab;
     [SerializeField] StaminaBar staminaBar;
+    [SerializeField] Camera mainCamera;
+    GameObject net;
+    CameraFollow cameraFollow;
 
     [Header("Casting Logic Operators")]
+    float pullSpeed;
     float castDistance;
     float chargeRate = 1f;
     public float sumChargeRate;
     bool isCharging;
+    bool isPulling;
 
     [Header("Net Limits")]
     [SerializeField] int maxNets;
     List<GameObject> activeNets = new List<GameObject>();
+
+    Coroutine currentPull;
+
+    void Awake()
+    {
+        cameraFollow = mainCamera.GetComponent<CameraFollow>();
+    }
 
     void OnEnable()
     {
@@ -63,22 +80,30 @@ public class NetCast : MonoBehaviour
     {
         isCharging = false;
 
-        if (staminaBar.current > castChargeAmount) CastNet();
-        else Debug.Log("Not enough stamina to cast");
+        if (net != null)
+        {
+            PullNetIn();
+        }
+        else
+        {
+            if (staminaBar.current > castChargeAmount) CastNet();
+            else Debug.Log("Not enough stamina to cast");
+        }
+
     }
 
     void CastNet()
     {
         if (castChargeAmount < staminaBar.current)
         {
-            //spawn net in front of ship
+            //spawn net in front of ship and add to activeNets list
             Vector3 netSpawnPosition = transform.position + new Vector3(transform.forward.x, 1, transform.forward.z);
             GameObject netInstance = Instantiate(netPrefab, netSpawnPosition, Quaternion.identity);
 
+            net = netInstance;
+
             netRb = netInstance.GetComponent<Rigidbody>();
             activeNets.Add(netInstance);
-
-            CameraManager.Instance.cameraTarget = netInstance.transform;
 
 
             if (netRb != null)
@@ -87,6 +112,8 @@ public class NetCast : MonoBehaviour
                 netRb.AddForce(throwDirection * castChargeAmount, ForceMode.Impulse);
             }
 
+            cameraFollow.targetToFollow = netRb.transform;
+
             //destroy new nets if there are more than are allowed
             if (activeNets.Count > maxNets)
             {
@@ -94,17 +121,27 @@ public class NetCast : MonoBehaviour
                 Destroy(netInstance);
             }
 
-            if (CameraManager.Instance != null)
-            {
-                CameraManager.Instance.FocusBetweenPlayerAndTarget(netInstance.transform.position);
-            }
-
             StartCoroutine(StaminaUpdate());
         }
-
-
-
         castChargeAmount = 0f;
+    }
+
+    void PullNetIn()
+    {
+        if (staminaBar.current < pullStaminaCost)
+        {
+            Debug.Log("Not enough stamina to pull");
+            return;
+        }
+
+        staminaBar.UseStamina(pullStaminaCost);
+
+        if (currentPull != null)
+            StopCoroutine(currentPull);
+
+        currentPull = StartCoroutine(PullUpdate());
+
+
     }
 
     IEnumerator StaminaUpdate()
@@ -117,6 +154,36 @@ public class NetCast : MonoBehaviour
 
         yield return null;
 
+    }
+
+    IEnumerator PullUpdate()
+    {
+        if (net == null) yield break;
+
+        Vector3 start = net.transform.position;
+        Vector3 end = start + (transform.position - start).normalized * pullIncrement;
+        float duration = 0.2f;
+        float elapsed = 0f;
+
+        while (elapsed < duration && net != null)
+        {
+            net.transform.position = Vector3.Lerp(start, end, elapsed / duration);
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        if (net != null)
+        {
+            net.transform.position = end;
+
+            if (Vector3.Distance(net.transform.position, transform.position) < 2.5f)
+            {
+                Debug.Log("Net Retrieved!");
+                Destroy(net);
+                net = null;
+                cameraFollow.targetToFollow = transform;
+            }
+        }
     }
 
 }
