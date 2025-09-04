@@ -25,10 +25,9 @@ public class NetBehaviour : MonoBehaviour
     {
         rb = GetComponent<Rigidbody>();
 
-        if (FishManager.Instance != null)
+        if (FishingSystem.Instance != null)
         {
-            fishList = FishManager.Instance.fishList;
-            Debug.Log($"FishManager has {fishList.Count} fish");
+            fishList = FishingSystem.Instance.caughtFish;
         }
     }
 
@@ -70,7 +69,7 @@ public class NetBehaviour : MonoBehaviour
         Debug.Log($"Waiting {time} seconds to catch a fish...");
         yield return new WaitForSeconds(time);
 
-        Fish caughtFish = FishingManager.Instance.TryCatchFish();
+        Fish caughtFish = FishingSystem.Instance.TryCatchFish();
 
         if (caughtFish != null)
         {

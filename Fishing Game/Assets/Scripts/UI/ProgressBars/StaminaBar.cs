@@ -6,8 +6,6 @@ using UnityEngine.InputSystem;
 
 public class StaminaBar : ProgressBarBase
 {
-    public float waitSecondsToRefill = 2.5f;
-
     Color startColor = Color.green;
     Color endColor = Color.red;
 
@@ -15,12 +13,6 @@ public class StaminaBar : ProgressBarBase
     [SerializeField] GameObject staminaCanvas;
 
     Coroutine refillRoutine;
-    bool isRefilling;
-
-    [SerializeField] float refillSpeed;
-    public float usageAmont;
-
-    public InputAction useStamina;
 
     void Start()
     {
@@ -29,24 +21,19 @@ public class StaminaBar : ProgressBarBase
 
     void OnEnable()
     {
-        useStamina.Enable();
+        if (StaminaManager.Instance != null)
+            StaminaManager.Instance.OnStaminaChanged += UpdateBar;    
     }
 
     void OnDisable()
     {
-        useStamina.Disable();
+        if (StaminaManager.Instance != null)
+            StaminaManager.Instance.OnStaminaChanged -= UpdateBar;
     }
 
     protected override void Update()
     {
         base.Update();
-
-        if (useStamina.ReadValue<float>() > 0) //if button is held down or pressed
-        {
-            UseStamina(usageAmont);
-        }
-
-        StartCoroutine(ChangeColorOverTime());
     }
 
     void LateUpdate()
@@ -57,18 +44,11 @@ public class StaminaBar : ProgressBarBase
         }
     }
 
-    public void UseStamina(float useAmount)
+    void UpdateBar(float currentValue, float maxValue)
     {
-        current -= useAmount;
-        current = Mathf.Max(0, current);
-
-        if (refillRoutine != null) //restart coroutine if its already going
-        {
-            StopCoroutine(refillRoutine);
-        }
-        isRefilling = false;
-
-        refillRoutine = StartCoroutine(RefillStamina());
+        current = currentValue;
+        maximum = (int)maxValue;
+        fill.fillAmount = current / maximum;
     }
 
     IEnumerator ChangeColorOverTime()
@@ -97,19 +77,5 @@ public class StaminaBar : ProgressBarBase
         
     }
 
-    IEnumerator RefillStamina()
-    {
-        yield return new WaitForSeconds(waitSecondsToRefill);
-
-        isRefilling = true;
-        while (current < maximum)
-        {
-            current += refillSpeed;
-            current = Mathf.Min(maximum, current);
-            yield return null;
-        }
-        isRefilling = false;
-        refillRoutine = null;
-    }
 
 }
