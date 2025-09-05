@@ -34,10 +34,14 @@ public class NetCastAndPull : MonoBehaviour
     List<GameObject> activeNets = new List<GameObject>();
 
     Coroutine currentPull;
+    float chanceToCatchAnyFish;
+
+    [SerializeField] float chanceDecrementRate;
 
     void Awake()
     {
         cameraFollow = mainCamera.GetComponent<CameraFollow>();
+        chanceToCatchAnyFish = FishingSystem.Instance.chanceToCatchAnyFish;
     }
 
     void OnEnable()
@@ -75,7 +79,9 @@ public class NetCastAndPull : MonoBehaviour
             if (StaminaManager.Instance.CanUse(pullStaminaCost))
             {
                 if (currentPull == null)
+                {
                     currentPull = StartCoroutine(PullNetCoroutine());
+                }
             }
         }
         else
@@ -83,6 +89,7 @@ public class NetCastAndPull : MonoBehaviour
             isCharging = true;
             castChargeAmount = 0f; // reset charge amount when casting again if necessary
         }
+
     }
 
     void OnCastReleased(InputAction.CallbackContext callbackContext)
@@ -108,8 +115,9 @@ public class NetCastAndPull : MonoBehaviour
     }
 
     void CastNet()
-    {
-        Vector3 netSpawnPositon = transform.position + transform.forward + Vector3.up;
+    {   
+        FishingSystem.Instance.chanceToCatchAnyFish = chanceToCatchAnyFish;
+        Vector3 netSpawnPositon = transform.position + transform.forward + Vector3.up * 2;
         GameObject newNetInstance = Instantiate(netPrefab, netSpawnPositon, Quaternion.identity);
         activeNets.Add(newNetInstance);
 
@@ -135,11 +143,6 @@ public class NetCastAndPull : MonoBehaviour
         castChargeAmount = 0f;
     }
 
-    void PullNet()
-    {
-        StartCoroutine(PullNetCoroutine());
-    }
-
     IEnumerator PullNetCoroutine()
     {
         if (net == null) yield break;
@@ -148,6 +151,7 @@ public class NetCastAndPull : MonoBehaviour
 
         while (net != null && isPulling)
         {
+            FishingSystem.Instance.chanceToCatchAnyFish -= chanceDecrementRate;
             float staminaCost = (pullStaminaCost + netInstanceRb.mass) * Time.deltaTime;
             if (!StaminaManager.Instance.CanUse(staminaCost))
             {

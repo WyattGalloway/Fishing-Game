@@ -69,14 +69,23 @@ public class NetBehaviour : MonoBehaviour
         Debug.Log($"Waiting {time} seconds to catch a fish...");
         yield return new WaitForSeconds(time);
 
-        Fish caughtFish = FishingSystem.Instance.TryCatchFish();
+        List<Fish> caughtFishList = FishingSystem.Instance.TryCatchMultipleFish();
 
-        if (caughtFish != null)
+        if (caughtFishList != null)
         {
             indicatorSprite.sprite = caughtSprite;
-            rb.mass += caughtFish.weight;
+            foreach (Fish fish in caughtFishList) {
+                rb.mass += fish.weight;
+            }
         }
+    }
 
-
+    void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.tag == "Player")
+        {
+            Debug.Log("Retrieved the net early!");
+            Destroy(gameObject);
+        }
     }
 }

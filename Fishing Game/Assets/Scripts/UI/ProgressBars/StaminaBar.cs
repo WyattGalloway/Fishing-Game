@@ -49,6 +49,15 @@ public class StaminaBar : ProgressBarBase
         current = currentValue;
         maximum = (int)maxValue;
         fill.fillAmount = current / maximum;
+
+        if (current < (maximum / 3))
+        {
+            StartCoroutine(ChangeColorOverTime());
+        }
+        else
+        {
+            StopCoroutine(ChangeColorOverTime());
+        }
     }
 
     IEnumerator ChangeColorOverTime()
