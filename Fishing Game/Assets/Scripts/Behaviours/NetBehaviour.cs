@@ -71,7 +71,7 @@ public class NetBehaviour : MonoBehaviour
 
         List<Fish> caughtFishList = FishingSystem.Instance.TryCatchMultipleFish();
 
-        if (caughtFishList != null)
+        if (caughtFishList != null && caughtFishList.Count != 0)
         {
             indicatorSprite.sprite = caughtSprite;
             foreach (Fish fish in caughtFishList) {
@@ -84,7 +84,7 @@ public class NetBehaviour : MonoBehaviour
     {
         if (collision.gameObject.tag == "Player")
         {
-            Debug.Log("Retrieved the net early!");
+            Debug.Log("Retrieved the net!");
             Destroy(gameObject);
         }
     }
