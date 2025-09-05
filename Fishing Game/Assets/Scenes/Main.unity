@@ -1846,7 +1846,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   turnSpeed: 60
-  moveSpeed: 25
+  currentSpeed: 0
+  maxMoveSpeed: 10
+  acceleration: 3
+  deceleration: 2
   rb: {fileID: 2011997793}
 --- !u!114 &2011997792
 MonoBehaviour:
