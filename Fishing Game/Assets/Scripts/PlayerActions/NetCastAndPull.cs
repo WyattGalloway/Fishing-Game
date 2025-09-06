@@ -34,8 +34,6 @@ public class NetCastAndPull : MonoBehaviour
     List<GameObject> activeNets = new List<GameObject>();
 
     Coroutine currentPull;
-    Coroutine chargeCoroutine;
-
     float chanceToCatchAnyFish;
 
     [SerializeField] float chanceDecrementRate;
@@ -83,12 +81,6 @@ public class NetCastAndPull : MonoBehaviour
                 if (currentPull == null)
                 {
                     currentPull = StartCoroutine(PullNetCoroutine());
-
-                    if (chargeCoroutine != null)
-                    { 
-                        StopCoroutine(chargeCoroutine);
-                        chargeCoroutine = null;
-                    }
                 }
             }
         }
@@ -104,9 +96,8 @@ public class NetCastAndPull : MonoBehaviour
     {
         isCharging = false;
 
-        if (currentPull != null && chargeCoroutine == null)
+        if (currentPull != null)
         {
-            chargeCoroutine = StartCoroutine(ChanceRecharge());
             StopCoroutine(currentPull);
             currentPull = null;
             isPulling = false;
@@ -124,7 +115,7 @@ public class NetCastAndPull : MonoBehaviour
     }
 
     void CastNet()
-    {
+    {   
         FishingSystem.Instance.chanceToCatchAnyFish = chanceToCatchAnyFish;
         Vector3 netSpawnPositon = transform.position + transform.forward + Vector3.up * 2;
         GameObject newNetInstance = Instantiate(netPrefab, netSpawnPositon, Quaternion.identity);
@@ -191,35 +182,6 @@ public class NetCastAndPull : MonoBehaviour
         currentPull = null;
     }
 
-    IEnumerator ChanceRecharge()
-    {
-        float duration = 2f;
-        float elapsed = 0;
 
-        while (elapsed < duration)
-        {
-            yield return new WaitForSeconds(0.5f);
-
-            if (!isPulling)
-            {
-                FishingSystem.Instance.chanceToCatchAnyFish += chanceDecrementRate;
-
-                if (FishingSystem.Instance.chanceToCatchAnyFish >= chanceToCatchAnyFish)
-                {
-                    FishingSystem.Instance.chanceToCatchAnyFish = chanceToCatchAnyFish;
-                    yield break;
-                }
-
-                elapsed += 0.1f;
-
-            }
-            else
-            {
-                yield break;
-            }
-        }
-
-        chargeCoroutine = null;
-    }
 
 }
