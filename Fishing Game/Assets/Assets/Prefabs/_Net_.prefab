@@ -89,7 +89,7 @@ GameObject:
   - component: {fileID: 5558304165723711495}
   - component: {fileID: 4120755108144708744}
   - component: {fileID: 59785589709950677}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: _Net_
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -184,8 +184,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Size: {x: 1, y: 0.7119001, z: 1}
+  m_Center: {x: 0, y: 0.14404994, z: 0}
 --- !u!54 &4120755108144708744
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -231,6 +231,9 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 16
   indicatorSprite: {fileID: 336056993370265713}
+  lakeBedLayer:
+    serializedVersion: 2
+    m_Bits: 1024
 --- !u!1 &4698664332386142137
 GameObject:
   m_ObjectHideFlags: 0
@@ -291,7 +294,7 @@ Canvas:
   m_AdditionalShaderChannelsFlag: 0
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
-  m_SortingOrder: 1
+  m_SortingOrder: 3
   m_TargetDisplay: 0
 --- !u!114 &5834776111316167372
 MonoBehaviour:

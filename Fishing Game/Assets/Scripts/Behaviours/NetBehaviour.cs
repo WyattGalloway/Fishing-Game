@@ -17,9 +17,13 @@ public class NetBehaviour : MonoBehaviour
     Coroutine fishingCoroutine;
 
     bool isOnWater;
+    bool isSinking;
     bool isFishing;
+    bool isOnLakeBed;
 
     Rigidbody rb;
+
+    [SerializeField] LayerMask lakeBedLayer;
 
     void Start()
     {
@@ -27,22 +31,34 @@ public class NetBehaviour : MonoBehaviour
 
         if (FishingSystem.Instance != null)
         {
-            fishList = FishingSystem.Instance.caughtFish;
+            fishList = FishingSystem.Instance.caughtFish; //instantiate the caught fish list
         }
     }
 
     void Update()
     {
-        bool currentlyOnWater = CheckIfOnWater();
+        bool currentlyOnWater = CheckIfOnWater(); //water checking
 
-        if (currentlyOnWater && !isOnWater && !isFishing)
+        // activate the indicator if on the water and wait for fish
+        if (currentlyOnWater && !isOnWater && !isFishing && !isOnLakeBed)
         {
             indicator.SetActive(true);
-            float waitTime = Random.Range(2f, 10f);
-            fishingCoroutine = StartCoroutine(FishingTimer(waitTime));
-            isFishing = true;
+
+            if (!isFishing)
+            {
+                isFishing = true;
+                float waitTime = Random.Range(2f, 6f);
+                fishingCoroutine = StartCoroutine(FishingTimer(waitTime));
+            }
+
+            if (!isSinking)
+            {
+                StartCoroutine(NetSinking());
+                isSinking = true;
+            }
+
         }
-        else if (!currentlyOnWater && isOnWater)
+        else if (!currentlyOnWater && isOnWater && !isFishing && !isOnLakeBed) //deactivate indicator if not on the water
         {
             indicator.SetActive(false);
 
@@ -66,6 +82,7 @@ public class NetBehaviour : MonoBehaviour
 
     IEnumerator FishingTimer(float time)
     {
+        //waits a random amount of time and then adds multiple fish to the fish list through the fishing system
         Debug.Log($"Waiting {time} seconds to catch a fish...");
         yield return new WaitForSeconds(time);
 
@@ -73,18 +90,50 @@ public class NetBehaviour : MonoBehaviour
 
         if (caughtFishList != null)
         {
-            indicatorSprite.sprite = caughtSprite;
-            foreach (Fish fish in caughtFishList) {
-                rb.mass += fish.weight;
+            indicatorSprite.sprite = caughtSprite; //changes indicator to a !
+            foreach (Fish fish in caughtFishList)
+            {
+                rb.mass += fish.weight; //adds all the masses of each fish to the nets rigidbody weight
             }
         }
+    }
+
+    IEnumerator NetSinking()
+    {
+        rb.useGravity = false;
+        float duration = 1f;
+        float elapsed = 0f;
+        float sinkSpeed = 0.25f;
+
+        while (elapsed < duration)
+        {
+            RaycastHit hit;
+            float checkDistance = 1f;
+
+            if (Physics.Raycast(transform.position, Vector3.down, out hit, checkDistance, lakeBedLayer))
+            {
+                Debug.Log("Stopping sink");
+                isSinking = false;
+                isOnLakeBed = true;
+                break;
+            }
+            else
+            {
+                transform.position += Vector3.down * sinkSpeed * Time.deltaTime;
+                elapsed += Time.deltaTime;
+                yield return null;
+            }
+        }
+
+        Debug.Log(isSinking);
+        isSinking = false;
     }
 
     void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.tag == "Player")
         {
-            Debug.Log("Retrieved the net early!");
+            Debug.Log("Retrieved the net early!"); // collect the net if its in the scene and you run into it
             Destroy(gameObject);
         }
     }
