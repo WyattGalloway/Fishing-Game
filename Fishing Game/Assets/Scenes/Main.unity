@@ -1185,7 +1185,7 @@ MeshCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 5
-  m_Convex: 0
+  m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!23 &1221679457
@@ -2050,9 +2050,10 @@ MonoBehaviour:
   castChargeAmount: 0
   maximumCastChargeAmount: 10
   pullStaminaCost: 5
-  netPrefab: {fileID: 4390782343146088208, guid: 942786af3bbd0884ca1009a3901dba8c, type: 3}
+  netPrefab: {fileID: 5635930476362468181, guid: d31799a1912ef534db4013fa9fa830ac, type: 3}
   netInstanceRb: {fileID: 4120755108144708744, guid: 942786af3bbd0884ca1009a3901dba8c, type: 3}
   mainCamera: {fileID: 1414436235}
+  animator: {fileID: 0}
   castingChargeRate: 0.5
   pullSpeed: 5
   castDistance: 0

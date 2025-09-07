@@ -12,6 +12,7 @@ public class NetBehaviour : MonoBehaviour
     [SerializeField] LayerMask waterLayer;
     [SerializeField] Image indicatorSprite;
 
+
     [Header("Fish Logic")]
     List<Fish> fishList;
     Coroutine fishingCoroutine;

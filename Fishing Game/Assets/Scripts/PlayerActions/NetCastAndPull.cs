@@ -19,6 +19,7 @@ public class NetCastAndPull : MonoBehaviour
     [SerializeField] GameObject netPrefab;
     [SerializeField] Rigidbody netInstanceRb;
     [SerializeField] Camera mainCamera;
+    [SerializeField] Animator animator;
     GameObject net;
     CameraFollow cameraFollow;
 
@@ -118,12 +119,18 @@ public class NetCastAndPull : MonoBehaviour
     }
 
     void CastNet()
-    {  
+    {
         // spawn in the net in the forward direction of the player and add to activeNets list
         FishingSystem.Instance.chanceToCatchAnyFish = chanceToCatchAnyFish;
         Vector3 netSpawnPositon = transform.position + transform.forward + (Vector3.up * 2);
         GameObject newNetInstance = Instantiate(netPrefab, netSpawnPositon, Quaternion.identity);
+
+        animator = newNetInstance.GetComponent<Animator>();
+        animator.SetTrigger("Net_Throw");
         activeNets.Add(newNetInstance);
+
+        
+        
 
         //make sure the net instance is referenced and rigidbody is assigned to variable
         net = newNetInstance;
@@ -148,6 +155,7 @@ public class NetCastAndPull : MonoBehaviour
         }
 
         castChargeAmount = 0f; // reset the charge amount for casting
+        animator.SetTrigger("Net_Stay");
     }
 
     IEnumerator PullNetCoroutine()
