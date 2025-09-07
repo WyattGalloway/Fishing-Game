@@ -4,7 +4,7 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class NetBehaviour : MonoBehaviour
+public class BobberBehaviour : MonoBehaviour
 {
     [Header("References")]
     [SerializeField] GameObject indicator;
@@ -18,13 +18,9 @@ public class NetBehaviour : MonoBehaviour
     Coroutine fishingCoroutine;
 
     bool isOnWater;
-    bool isSinking;
     bool isFishing;
-    bool isOnLakeBed;
 
     Rigidbody rb;
-
-    [SerializeField] LayerMask lakeBedLayer;
 
     void Start()
     {
@@ -41,9 +37,14 @@ public class NetBehaviour : MonoBehaviour
         bool currentlyOnWater = CheckIfOnWater(); //water checking
 
         // activate the indicator if on the water and wait for fish
-        if (currentlyOnWater && !isOnWater && !isFishing && !isOnLakeBed)
+        if (currentlyOnWater && !isOnWater && !isFishing)
         {
             indicator.SetActive(true);
+
+            rb.useGravity = false;
+            rb.linearVelocity = Vector3.zero;
+            float yOffset = Mathf.Sin(Time.time * 2f) * 0.1f;
+            transform.position = new Vector3(transform.position.x, transform.position.y + yOffset, transform.position.z);
 
             if (!isFishing)
             {
@@ -51,17 +52,12 @@ public class NetBehaviour : MonoBehaviour
                 float waitTime = Random.Range(2f, 6f);
                 fishingCoroutine = StartCoroutine(FishingTimer(waitTime));
             }
-
-            if (!isSinking)
-            {
-                StartCoroutine(NetSinking());
-                isSinking = true;
-            }
-
         }
-        else if (!currentlyOnWater && isOnWater && !isFishing && !isOnLakeBed) //deactivate indicator if not on the water
+        else if (!currentlyOnWater && isOnWater && !isFishing) //deactivate indicator if not on the water
         {
             indicator.SetActive(false);
+
+            rb.useGravity = true;
 
             if (fishingCoroutine != null)
             {
@@ -87,55 +83,22 @@ public class NetBehaviour : MonoBehaviour
         Debug.Log($"Waiting {time} seconds to catch a fish...");
         yield return new WaitForSeconds(time);
 
-        List<Fish> caughtFishList = FishingSystem.Instance.TryCatchMultipleFish();
+        Fish caughtFish = FishingSystem.Instance.TryCatchSingleFish();
 
-        if (caughtFishList != null)
+        if (caughtFish != null)
         {
             indicatorSprite.sprite = caughtSprite; //changes indicator to a !
-            foreach (Fish fish in caughtFishList)
-            {
-                rb.mass += fish.weight; //adds all the masses of each fish to the nets rigidbody weight
-            }
+            rb.mass += caughtFish.weight; //adds all the masses of each fish to the nets rigidbody weight
         }
-    }
-
-    IEnumerator NetSinking()
-    {
-        rb.useGravity = false;
-        float duration = 1f;
-        float elapsed = 0f;
-        float sinkSpeed = 0.25f;
-
-        while (elapsed < duration)
-        {
-            RaycastHit hit;
-            float checkDistance = 1f;
-
-            if (Physics.Raycast(transform.position, Vector3.down, out hit, checkDistance, lakeBedLayer))
-            {
-                Debug.Log("Stopping sink");
-                isSinking = false;
-                isOnLakeBed = true;
-                break;
-            }
-            else
-            {
-                transform.position += Vector3.down * sinkSpeed * Time.deltaTime;
-                elapsed += Time.deltaTime;
-                yield return null;
-            }
-        }
-
-        Debug.Log(isSinking);
-        isSinking = false;
     }
 
     void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.tag == "Player")
         {
-            Debug.Log("Retrieved the net!"); // collect the net if its in the scene and you run into it
+            Debug.Log("Retrieved the bobber!"); // collect the net if its in the scene and you run into it
             Destroy(gameObject);
         }
     }
 }
+
