@@ -41,11 +41,6 @@ public class BobberBehaviour : MonoBehaviour
         {
             indicator.SetActive(true);
 
-            rb.useGravity = false;
-            rb.linearVelocity = Vector3.zero;
-            float yOffset = Mathf.Sin(Time.time * 2f) * 0.1f;
-            transform.position = new Vector3(transform.position.x, transform.position.y + yOffset, transform.position.z);
-
             if (!isFishing)
             {
                 isFishing = true;
@@ -57,8 +52,6 @@ public class BobberBehaviour : MonoBehaviour
         {
             indicator.SetActive(false);
 
-            rb.useGravity = true;
-
             if (fishingCoroutine != null)
             {
                 StopCoroutine(fishingCoroutine);
@@ -68,13 +61,20 @@ public class BobberBehaviour : MonoBehaviour
             isFishing = false;
         }
 
+        if (isOnWater)
+        {
+            float yOffset = Mathf.Sin(Time.deltaTime * 5f) * 0.1f;
+            rb.MovePosition(rb.position + new Vector3(0, yOffset, 0));
+        }
+
         isOnWater = currentlyOnWater;
     }
 
+
     bool CheckIfOnWater()
     {
-        Debug.DrawRay(transform.position, Vector3.down * 1f, Color.red);
-        return Physics.Raycast(transform.position, Vector3.down, 1f, waterLayer);
+        Debug.DrawRay(transform.position, Vector3.down * 0.5f, Color.red);
+        return Physics.Raycast(transform.position, Vector3.down, 0.5f, waterLayer);
     }
 
     IEnumerator FishingTimer(float time)
@@ -87,7 +87,7 @@ public class BobberBehaviour : MonoBehaviour
 
         if (caughtFish != null)
         {
-            indicatorSprite.sprite = caughtSprite; //changes indicator to a !
+            indicatorSprite.sprite = caughtSprite; //changes indicator to !
             rb.mass += caughtFish.weight; //adds all the masses of each fish to the nets rigidbody weight
         }
     }
