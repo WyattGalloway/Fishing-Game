@@ -28,7 +28,7 @@ public class BobberBehaviour : MonoBehaviour
 
         if (FishingSystem.Instance != null)
         {
-            fishList = FishingSystem.Instance.caughtFish; //instantiate the caught fish list
+            fishList = FishingSystem.Instance.availableFishPool; //instantiate the caught fish list
         }
     }
 

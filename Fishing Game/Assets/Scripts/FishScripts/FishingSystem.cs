@@ -4,8 +4,9 @@ using UnityEngine;
 public class FishingSystem : MonoBehaviour
 {
     public static FishingSystem Instance;
+    public event System.Action OnFishCaught;
 
-    public List<Fish> caughtFish = new List<Fish>();
+    public List<Fish> availableFishPool = new List<Fish>();
 
     [SerializeField, Range(0, 1f)] public float chanceToCatchAnyFish;
 
@@ -19,11 +20,12 @@ public class FishingSystem : MonoBehaviour
     public Fish CatchRandomFish()
     {
         Fish randomFish = FishLibrary.GetRandomFish();
-        caughtFish.Add(randomFish);
+        availableFishPool.Add(randomFish);
         return randomFish;
     }
 
-    public List<Fish> totalCaughtFish => caughtFish;    // new list for FUTURE USE
+    List<Fish> allCaughtFish = new List<Fish>();
+    public List<Fish> totalCaughtFish => allCaughtFish; //used for display purposes
 
     public Fish TryCatchSingleFish()
     {
@@ -33,18 +35,20 @@ public class FishingSystem : MonoBehaviour
             return null;
         }
 
-        if (caughtFish.Count == 0)
+        if (availableFishPool.Count == 0)
         {
             CatchRandomFish(); // makes sure that there is still always a fish to catch
         }
 
-        if (caughtFish.Count > 0)
+        if (availableFishPool.Count > 0)
         {
-            int fishIndex = Random.Range(0, caughtFish.Count);
-            Fish recentlyCaughtFish = caughtFish[fishIndex];
-            Debug.Log($"You caught a {recentlyCaughtFish.name} weighing {recentlyCaughtFish.weight:F2} lbs!");
-            caughtFish.Remove(recentlyCaughtFish);
-            return recentlyCaughtFish;
+            int fishIndex = Random.Range(0, availableFishPool.Count); //amount of fish in available fish pool (1)
+            Fish recentlyAvailableFish = availableFishPool[fishIndex]; //gets the most recent available fish
+            //Debug.Log($"You caught a {recentlyAvailableFish.name} weighing {recentlyAvailableFish.weight:F2} lbs!");
+            allCaughtFish.Add(recentlyAvailableFish); //add to display list
+            OnFishCaught?.Invoke(); //trigger update to display list
+            availableFishPool.Remove(recentlyAvailableFish); //remove from the available fish pool
+            return recentlyAvailableFish;
         }
 
         Debug.Log("Seems theres no fish to catch here...");
@@ -61,11 +65,11 @@ public class FishingSystem : MonoBehaviour
 
         int amountOfFish = Random.Range(1, 6);
 
-        if (caughtFish.Count == 0)
+        if (availableFishPool.Count == 0)
         {
             for (int i = 0; i < amountOfFish; i++)
             {
-                CatchRandomFish();
+                CatchRandomFish(); //makes sure theres multiple fish to be caught if needed
             }
         }
 
@@ -73,35 +77,40 @@ public class FishingSystem : MonoBehaviour
 
         for (int i = 0; i < amountOfFish; i++)
         {
-            if (caughtFish.Count == 0) break;
+            if (availableFishPool.Count == 0) break;
 
-            int fishIndex = Random.Range(0, caughtFish.Count);
-            Fish fish = caughtFish[fishIndex];
-            caughtFish.RemoveAt(fishIndex);
-            caughtThisAttempt.Add(fish);
+            int fishIndex = Random.Range(0, availableFishPool.Count); //gets index of each fish in the pool
+            Fish fish = availableFishPool[fishIndex];
+            availableFishPool.RemoveAt(fishIndex); //removes fish from available fish pool
+            caughtThisAttempt.Add(fish); //adds fish to the caught fish list
         }
 
         Dictionary<string, (int count, float totalWeight)> groupedFish = new Dictionary<string, (int, float)>();
 
         foreach (Fish fish in caughtThisAttempt)
         {
-            if (groupedFish.ContainsKey(fish.name))
+            if (groupedFish.ContainsKey(fish.name)) //checks if the new dictionary has fish in it
             {
-                var entry = groupedFish[fish.name];
-                groupedFish[fish.name] = (entry.count + 1, entry.totalWeight + fish.weight);
+                var entry = groupedFish[fish.name]; //variable is fish name
+                groupedFish[fish.name] = (entry.count + 1, entry.totalWeight + fish.weight); //adds all the fishes and their total weight together
             }
             else
             {
-                groupedFish.Add(fish.name, (1, fish.weight));
+                groupedFish.Add(fish.name, (1, fish.weight)); //adds one fish
             }
-        }
 
+            allCaughtFish.Add(fish); //adds fish to the fish list
+        }
+        OnFishCaught?.Invoke(); //fish caught event
+
+        /* commented out for right now, deleting once not needed
         Debug.Log("You caught: ");
 
         foreach (var entry in groupedFish)
         {
             Debug.Log($" - {entry.Value.count} {entry.Key}(s) weighing a total of {entry.Value.totalWeight:F2} lbs");
         }
+        */
 
         return caughtThisAttempt;
     }
