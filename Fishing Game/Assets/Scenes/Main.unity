@@ -2028,7 +2028,7 @@ LineRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2011997786}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -2134,7 +2134,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2011997786}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4bd6ad6e2da020e42b4c2a7114e7d23b, type: 3}
   m_Name: 
@@ -2160,7 +2160,7 @@ MonoBehaviour:
   castingChargeRate: 0.5
   maximumCastChargeAmount: 10
   pullStaminaCost: 5
-  pullSpeed: 10
+  pullSpeed: 100
   chanceDecrementRate: 0.05
   netPrefab: {fileID: 5635930476362468181, guid: d31799a1912ef534db4013fa9fa830ac, type: 3}
   animator: {fileID: 1059362491444829965, guid: d31799a1912ef534db4013fa9fa830ac, type: 3}
@@ -2173,7 +2173,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2011997786}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f0c1504a1e37eb5409242bd1294707ee, type: 3}
   m_Name: 
@@ -2199,7 +2199,7 @@ MonoBehaviour:
   castingChargeRate: 0.5
   maximumCastChargeAmount: 10
   pullStaminaCost: 5
-  pullSpeed: 10
+  pullSpeed: 25
   chanceDecrementRate: 0.005
   bobberPrefab: {fileID: 1851079398324335261, guid: b0abbc144db49dd4eb6fac3c56d381e6, type: 3}
   mainCamera: {fileID: 1414436235}

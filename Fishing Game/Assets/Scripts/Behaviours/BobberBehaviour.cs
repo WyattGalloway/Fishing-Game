@@ -41,8 +41,6 @@ public class BobberBehaviour : MonoBehaviour
         {
             indicator.SetActive(true);
 
-            rb.useGravity = false;
-            rb.linearVelocity = Vector3.zero;
             float yOffset = Mathf.Sin(Time.time * 2f) * 0.1f;
             transform.position = new Vector3(transform.position.x, transform.position.y + yOffset, transform.position.z);
 
@@ -56,8 +54,6 @@ public class BobberBehaviour : MonoBehaviour
         else if (!currentlyOnWater && isOnWater && !isFishing) //deactivate indicator if not on the water
         {
             indicator.SetActive(false);
-
-            rb.useGravity = true;
 
             if (fishingCoroutine != null)
             {

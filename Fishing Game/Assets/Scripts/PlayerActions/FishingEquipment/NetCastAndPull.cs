@@ -65,43 +65,12 @@ public class NetCastAndPull : FishingEquipmentBase
 
         isPulling = true;
 
-        while (net != null && isPulling)
-        {
-            FishingSystem.Instance.chanceToCatchAnyFish -= chanceDecrementRate;
-            float staminaCost = (pullStaminaCost + netRb.mass) * Time.deltaTime;
+        Debug.Log("Net Instantly Retrieved");
 
-            if (!StaminaManager.Instance.CanUse(staminaCost))
-            {
-                Debug.Log("Not enough stamina to pull net!");
-                isPulling = false;
-                break;
-            }
+        Destroy(net);
+        net = null;
 
-            StaminaManager.Instance.UseStamina(staminaCost);
-
-            Vector3 directionToPlayer = (transform.position - net.transform.position).normalized;
-
-            float massFactor = 1f / Mathf.Max((netRb.mass - 1f) * 0.5f + 1f, 0.1f);
-            float adjustedPullSpeed = pullSpeed * massFactor;
-            float pullSpeedHolder = pullSpeed;
-            pullSpeed = adjustedPullSpeed;
-            float step = adjustedPullSpeed * Time.deltaTime;
-
-            net.transform.position += directionToPlayer * step;
-
-            if (Vector3.Distance(net.transform.position, transform.position) < 2.5f)
-            {
-                Debug.Log("Net retrieved!");
-                Destroy(net);
-                net = null;
-                cameraFollow.targetToFollow = transform;
-                break;
-            }
-
-            pullSpeed = pullSpeedHolder;
-
-            yield return null;
-        }
+        cameraFollow.targetToFollow = transform;
 
         isPulling = false;
         pullCoroutine = null;
