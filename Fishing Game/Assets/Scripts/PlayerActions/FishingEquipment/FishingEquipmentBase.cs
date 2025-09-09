@@ -67,7 +67,7 @@ public abstract class FishingEquipmentBase : MonoBehaviour
             if (StaminaManager.Instance.CanUse(pullStaminaCost) && pullCoroutine == null)
             {
                 pullCoroutine = StartCoroutine(PullObjectCoroutine());
-
+                isPulling = true;
             }
         }
         else

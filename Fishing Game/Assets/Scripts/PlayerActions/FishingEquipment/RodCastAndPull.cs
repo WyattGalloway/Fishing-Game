@@ -6,29 +6,33 @@ using UnityEngine.InputSystem;
 
 public class RodCastAndPull : FishingEquipmentBase
 {
+    public event System.Action OnBobberSpawn;
+    public event System.Action OnFishCollect;
+    public event System.Action OnLineBreak;
+
     [Header("Rod Specific References")]
     [SerializeField] GameObject bobberPrefab;
     [SerializeField] Camera mainCamera;
-    [SerializeField] LineRenderer lineRenderer;
     [SerializeField] int maximumBobbersAllowed = 1;
-
-    [Header("Fishing Line Parameters")]
-    [SerializeField] float lineParabolaHeight = -3f;
 
     [Header("Pulling Parameters")]
     [SerializeField] float currentPullSpeed;
+    public bool IsPulling => isPulling;
+    float pullTime = 30f;
+    float currentPullTime;
 
     [Header("References")]
     CameraFollow cameraFollow;
     GameObject bobber;
     Rigidbody bobberRb;
     List<GameObject> activeBobbers = new List<GameObject>();
+    FishingLineBehaviour fishingLine;
 
     protected override void Awake()
     {
         base.Awake();
         currentPullSpeed = pullSpeed;
-        lineRenderer = GetComponent<LineRenderer>();
+        fishingLine = GetComponentInChildren<FishingLineBehaviour>();
         chanceToCatchAnyFish = FishingSystem.Instance.chanceToCatchAnyFish;
         cameraFollow = mainCamera.GetComponent<CameraFollow>();
     }
@@ -37,46 +41,19 @@ public class RodCastAndPull : FishingEquipmentBase
     {
         base.Update();
 
-        if (bobber != null) // when bobber is cast
-        {
-            lineRenderer.enabled = true; //create a fishing line
+        Debug.Log(currentPullTime);
+    }
 
-            //when not pulling and the parabola height is greater than -3 units then decrease it by 0.1 units (parabola opening upwards)
-            if (!isPulling && lineParabolaHeight > -3)
-            {
-                lineParabolaHeight -= 0.1f;
-                if (lineParabolaHeight < -3)
-                {
-                    lineParabolaHeight = -3f; //cap it at -3
-                }
-            }
+    protected override void OnEnable()
+    {
+        base.OnEnable();
+        FishingSystem.Instance.OnFishCaught += CollectFishAndBobber;
+    }
 
-            //drawing the parabola for the fishing line
-            Vector3 startPosition = transform.position;
-            Vector3 endPosition = bobber.transform.position;
-            Vector3 midPoint = (startPosition + endPosition) / 2f; //middle of the line
-            midPoint.y = Mathf.Max(startPosition.y, endPosition.y) + lineParabolaHeight;
-
-            int pointsCount = 20;
-            lineRenderer.positionCount = pointsCount;
-
-            //iterate over the points and set each one to make a parabola 
-            for (int i = 0; i < pointsCount; i++)
-            {
-                float t = i / ((float)pointsCount - 1f); //the current point divided by all the points - 1, since indexing is end index exclusive
-
-                //quadratic bezier curve, honestly its all chatGPT, but the equation is B(t) = ( 1 − t )^22 ⋅ P0 ​ + 2 * ( 1 − t ) t ⋅ P1 ​ + t^2 ⋅ P2 ​with P being the position
-                Vector3 point = Mathf.Pow(1 - t, 2) * startPosition +
-                                2 * (1 - t) * t * midPoint +
-                                Mathf.Pow(t, 2) * endPosition;
-                lineRenderer.SetPosition(i, point);
-            }
-        }
-        else
-        {
-            lineRenderer.positionCount = 0;
-            lineRenderer.enabled = false;
-        }
+    protected override void OnDisable()
+    {
+        base.OnDisable();
+        FishingSystem.Instance.OnFishCaught -= CollectFishAndBobber;
     }
 
     protected override void CastObject()
@@ -85,6 +62,10 @@ public class RodCastAndPull : FishingEquipmentBase
 
         Vector3 bobberSpawnPosition = transform.position + transform.forward + (Vector3.up * 2f); //spawns bobber slightly above the front of the ship to avoid collisions
         bobber = Instantiate(bobberPrefab, bobberSpawnPosition, Quaternion.identity);
+
+        OnBobberSpawn?.Invoke();
+
+        fishingLine.SetBobber(bobber.transform);
 
         bobberRb = bobber.GetComponent<Rigidbody>();
 
@@ -111,21 +92,74 @@ public class RodCastAndPull : FishingEquipmentBase
         return bobber != null;
     }
 
+    protected override void OnCastStarted(InputAction.CallbackContext callbackContext)
+    {
+        if (HasCastObject() && !isPulling)
+        {
+            StartPull();
+        }
+        else
+        {
+            base.OnCastStarted(callbackContext);
+        }
+    }
+
+    protected override void OnCastReleased(InputAction.CallbackContext callbackContext)
+    {
+        if (isPulling)
+        {
+            StopPull();
+        }
+        else if (!HasCastObject() && castingChargeAmount > 0f)
+        {
+            base.OnCastReleased(callbackContext);
+        }
+    }
+
+    void StartPull()
+    {
+        if (pullCoroutine == null)
+        {
+            isPulling = true;
+            pullCoroutine = StartCoroutine(PullObjectCoroutine());
+        }
+    }
+
+    void StopPull()
+    {
+        if (pullCoroutine != null)
+        {
+            StopCoroutine(pullCoroutine);
+            pullCoroutine = null;
+            currentPullTime = 0;
+        }
+        isPulling = false;
+    }
+
+    void CollectFishAndBobber()
+    {
+        if (bobber != null && isPulling && Vector3.Distance(bobber.transform.position, transform.position) < 2.5f)
+        {
+            Debug.Log("Bobber retrieved!");
+            Destroy(bobber);
+            bobber = null;
+            cameraFollow.targetToFollow = transform;
+            OnFishCollect?.Invoke(); 
+        }
+    }
+
     protected override IEnumerator PullObjectCoroutine()
     {
         if (bobber == null) yield break;
-        isPulling = true;
+
+        if (!isPulling) yield break;
 
         while (bobber != null && isPulling)
         {
             FishingSystem.Instance.chanceToCatchAnyFish -= chanceDecrementRate;
             float staminaCost = (pullStaminaCost + bobberRb.mass) * Time.deltaTime;
 
-            lineParabolaHeight += 0.1f;
-            if (lineParabolaHeight > 0)
-            {
-                lineParabolaHeight = 0;
-            }
+            currentPullTime += 0.1f;
 
             if (!StaminaManager.Instance.CanUse(staminaCost))
             {
@@ -145,23 +179,37 @@ public class RodCastAndPull : FishingEquipmentBase
 
             if (Vector3.Distance(bobber.transform.position, transform.position) < 2.5f)
             {
-                Debug.Log("Bobber retrieved!");
-                Destroy(bobber);
-                bobber = null;
-                cameraFollow.targetToFollow = transform;
+                CollectFishAndBobber();
                 break;
             }
 
-
+            StartCoroutine(BreakLineCoroutine());
 
             yield return null;
         }
 
-        lineRenderer.positionCount = 0;
+        currentPullTime = 0;
 
         currentPullSpeed = pullSpeed;
 
         isPulling = false;
         pullCoroutine = null;
+    }
+
+    IEnumerator BreakLineCoroutine()
+    {
+        if (currentPullTime >= pullTime)
+        {
+            Debug.Log("The line broke!");
+
+            OnLineBreak?.Invoke();
+            Destroy(bobber);
+            bobber = null;
+            yield break;
+        }
+        else
+        {
+            yield return null;
+        }
     }
 }

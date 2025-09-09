@@ -6,16 +6,17 @@ public class CaughtFishDisplay : MonoBehaviour
 {
     [SerializeField] TMP_Text text;
     [SerializeField] Canvas caughtFishDisplay;
+    [SerializeField] RodCastAndPull rodCastAndPull;
     List<Fish> caughtFish;
 
     void OnEnable()
     {
-        FishingSystem.Instance.OnFishCaught += UpdateFishList;
+        rodCastAndPull.OnFishCollect += UpdateFishList;
     }
 
     void OnDisable()
     {
-        FishingSystem.Instance.OnFishCaught -= UpdateFishList;
+        rodCastAndPull.OnFishCollect -= UpdateFishList;
     }
 
     void UpdateFishList()

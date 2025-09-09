@@ -44,7 +44,6 @@ public class FishingSystem : MonoBehaviour
         {
             int fishIndex = Random.Range(0, availableFishPool.Count); //amount of fish in available fish pool (1)
             Fish recentlyAvailableFish = availableFishPool[fishIndex]; //gets the most recent available fish
-            //Debug.Log($"You caught a {recentlyAvailableFish.name} weighing {recentlyAvailableFish.weight:F2} lbs!");
             allCaughtFish.Add(recentlyAvailableFish); //add to display list
             OnFishCaught?.Invoke(); //trigger update to display list
             availableFishPool.Remove(recentlyAvailableFish); //remove from the available fish pool
@@ -102,15 +101,6 @@ public class FishingSystem : MonoBehaviour
             allCaughtFish.Add(fish); //adds fish to the fish list
         }
         OnFishCaught?.Invoke(); //fish caught event
-
-        /* commented out for right now, deleting once not needed
-        Debug.Log("You caught: ");
-
-        foreach (var entry in groupedFish)
-        {
-            Debug.Log($" - {entry.Value.count} {entry.Key}(s) weighing a total of {entry.Value.totalWeight:F2} lbs");
-        }
-        */
 
         return caughtThisAttempt;
     }
