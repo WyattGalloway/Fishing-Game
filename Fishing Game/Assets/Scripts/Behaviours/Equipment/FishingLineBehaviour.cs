@@ -42,6 +42,10 @@ public class FishingLineBehaviour : MonoBehaviour
     public void SetBobber(Transform bobberTransform)
     {
         bobber = bobberTransform;
+        if (!IsPulling)
+        {
+            colorLerp -= 0.05f;
+        }
     }
 
     void DrawFishingLine()

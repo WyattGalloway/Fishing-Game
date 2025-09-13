@@ -8,8 +8,14 @@ public class CameraFollow : MonoBehaviour
 
     [SerializeField] float maxFollowRange;
 
+    void Start()
+    {
+        UnityEngine.Rendering.DebugManager.instance.enableRuntimeUI = false;
+    }
+
     void Update()
     {
+
         if (targetToFollow != null)
         {
             float distance = Vector3.Distance(player.position, targetToFollow.position);
