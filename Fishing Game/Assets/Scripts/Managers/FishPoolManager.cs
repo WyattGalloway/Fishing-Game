@@ -16,7 +16,7 @@ public class FishPoolManager : MonoBehaviour
             GameObject fish = Instantiate(fishPrefab);
             fish.SetActive(false);
 
-            TestFishBehaviour behaviour = fish.GetComponent<TestFishBehaviour>();
+            FishBoidBehaviour behaviour = fish.GetComponent<FishBoidBehaviour>();
             if (behaviour != null)
             {
                 behaviour.Initialize(lakeCollider);
