@@ -27,11 +27,6 @@ public abstract class FishingEquipmentBase : MonoBehaviour
     [Header("Coroutines")]
     protected Coroutine pullCoroutine;
 
-    protected virtual void Awake()
-    {
-        chanceToCatchAnyFish = FishingSystem.Instance.chanceToCatchAnyFish;
-    }
-
     protected virtual void OnEnable()
     {
         castAndPullAction.Enable();

@@ -17,11 +17,13 @@ public class PlayerController : MonoBehaviour
     [SerializeField] float deceleration = 2.0f;
     
     [SerializeField] Rigidbody rb;
+    [SerializeField] GameObject staminaBar;
 
     void Start()
     {
         playerInput = GetComponent<PlayerInput>();
         movement = playerInput.actions.FindAction("Move");
+        staminaBar.SetActive(false);
     }
 
     private void Update()

@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -12,55 +11,36 @@ public class BobberBehaviour : MonoBehaviour
     [SerializeField] LayerMask waterLayer;
     [SerializeField] Image indicatorSprite;
 
-
-    [Header("Fish Logic")]
-    List<Fish> fishList;
-    Coroutine fishingCoroutine;
-
-    bool isOnWater;
-    bool isFishing;
+    [Header("Settings")]
+    [SerializeField] float detectionRadius = 5f;
 
     Rigidbody rb;
+    bool isOnWater;
+    bool isFishing;
+    FishBoidBehaviour hookedFish;
 
     void Start()
     {
         rb = GetComponent<Rigidbody>();
-
-        if (FishingSystem.Instance != null)
-        {
-            fishList = FishingSystem.Instance.availableFishPool; //instantiate the caught fish list
-        }
     }
 
     void Update()
     {
-        bool currentlyOnWater = CheckIfOnWater(); //water checking
+        bool currentlyOnWater = CheckIfOnWater();
 
-        // activate the indicator if on the water and wait for fish
         if (currentlyOnWater && !isOnWater && !isFishing)
         {
             indicator.SetActive(true);
 
-            float yOffset = Mathf.Sin(Time.time * 2f) * 0.1f;
-            transform.position = new Vector3(transform.position.x, transform.position.y + yOffset, transform.position.z);
-
             if (!isFishing)
             {
                 isFishing = true;
-                float waitTime = Random.Range(2f, 6f);
-                fishingCoroutine = StartCoroutine(FishingTimer(waitTime));
+                StartCoroutine(StartFishingRoutine());
             }
         }
-        else if (!currentlyOnWater && isOnWater && !isFishing) //deactivate indicator if not on the water
+        else if (!currentlyOnWater && isOnWater && !isFishing)
         {
             indicator.SetActive(false);
-
-            if (fishingCoroutine != null)
-            {
-                StopCoroutine(fishingCoroutine);
-                fishingCoroutine = null;
-            }
-
             isFishing = false;
         }
 
@@ -69,32 +49,75 @@ public class BobberBehaviour : MonoBehaviour
 
     bool CheckIfOnWater()
     {
-        Debug.DrawRay(transform.position, Vector3.down * 1f, Color.red);
         return Physics.Raycast(transform.position, Vector3.down, 1f, waterLayer);
     }
 
-    IEnumerator FishingTimer(float time)
+    IEnumerator StartFishingRoutine()
     {
-        //waits a random amount of time and then adds multiple fish to the fish list through the fishing system
-        Debug.Log($"Waiting {time} seconds to catch a fish...");
-        yield return new WaitForSeconds(time);
+        float scanDelay = Random.Range(2f, 6f);
+        yield return new WaitForSeconds(scanDelay);
 
-        Fish caughtFish = FishingSystem.Instance.TryCatchSingleFish();
+        FishBoidBehaviour fish = ScanForNearbyFish();
 
-        if (caughtFish != null)
+        if (fish != null)
         {
-            indicatorSprite.sprite = caughtSprite; //changes indicator to a !
-            rb.mass += caughtFish.weight; //adds all the masses of each fish to the nets rigidbody weight
+            float biteDelay = 2f; //will make more variable in the future
+
+            yield return new WaitForSeconds(biteDelay);
+
+            HookFish(fish);
         }
+        else
+        {
+            Debug.Log("No fish nearby");
+            isFishing = false;
+            indicator.SetActive(false);
+        }
+    }
+
+    FishBoidBehaviour ScanForNearbyFish()
+    {
+        Collider[] hits = Physics.OverlapSphere(transform.position, detectionRadius);
+
+        foreach (var hit in hits)
+        {
+            if (hit.TryGetComponent<FishBoidBehaviour>(out var fish))
+            {
+                if (Random.value < fish.data.curiousity)
+                {
+                    return fish;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    void HookFish(FishBoidBehaviour fish)
+    {
+        hookedFish = fish;
+        fish.enabled = false;
+        fish.transform.SetParent(transform);
+        fish.transform.localPosition = Vector3.zero;
+
+        indicatorSprite.sprite = caughtSprite;
+
+        float weight = fish.currentWeight;
+        FishingSystem.Instance.RecordCaughtFish(fish.data, weight);
     }
 
     void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.tag == "Player")
+        if (collision.gameObject.CompareTag("Player"))
         {
-            Debug.Log("Retrieved the bobber!"); // collect the net if its in the scene and you run into it
+            if (hookedFish != null)
+            {
+                Destroy(hookedFish.gameObject);
+            }
+
             Destroy(gameObject);
-        }
+        }       
     }
+
 }
 

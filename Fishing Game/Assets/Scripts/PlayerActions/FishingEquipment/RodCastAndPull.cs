@@ -21,7 +21,7 @@ public class RodCastAndPull : FishingEquipmentBase
     [SerializeField] float currentPullSpeed;
     public bool IsPulling => isPulling;
     float pullTime = 30f;
-    float currentPullTime;
+    [SerializeField] float currentPullTime;
 
     [Header("References")]
     CameraFollow cameraFollow;
@@ -29,21 +29,18 @@ public class RodCastAndPull : FishingEquipmentBase
     Rigidbody bobberRb;
     List<GameObject> activeBobbers = new List<GameObject>();
     FishingLineBehaviour fishingLine;
+    [SerializeField] GameObject staminaBar;
 
-    protected override void Awake()
+    protected void Awake()
     {
-        base.Awake();
         currentPullSpeed = pullSpeed;
         fishingLine = GetComponentInChildren<FishingLineBehaviour>();
-        chanceToCatchAnyFish = FishingSystem.Instance.chanceToCatchAnyFish;
         cameraFollow = mainCamera.GetComponent<CameraFollow>();
     }
 
     protected override void Update()
     {
         base.Update();
-
-        Debug.Log(currentPullTime);
     }
 
     protected override void OnEnable()
@@ -60,7 +57,7 @@ public class RodCastAndPull : FishingEquipmentBase
 
     protected override void CastObject()
     {
-        FishingSystem.Instance.chanceToCatchAnyFish = chanceToCatchAnyFish;
+        staminaBar.SetActive(true);
 
         Vector3 bobberSpawnPosition = transform.position + transform.forward + (Vector3.up * 2f); //spawns bobber slightly above the front of the ship to avoid collisions
         bobber = Instantiate(bobberPrefab, bobberSpawnPosition, Quaternion.identity);
@@ -162,7 +159,8 @@ public class RodCastAndPull : FishingEquipmentBase
             Destroy(bobber);
             bobber = null;
             cameraFollow.targetToFollow = transform;
-            OnFishCollect?.Invoke(); 
+            OnFishCollect?.Invoke();
+            staminaBar.SetActive(false);
         }
     }
 
@@ -174,7 +172,7 @@ public class RodCastAndPull : FishingEquipmentBase
 
         while (bobber != null && isPulling)
         {
-            FishingSystem.Instance.chanceToCatchAnyFish -= chanceDecrementRate;
+            staminaBar.SetActive(true);
             float staminaCost = (pullStaminaCost + (bobberRb.mass * 0.5f)) * Time.deltaTime;
 
             currentPullTime += 0.1f;
@@ -206,12 +204,22 @@ public class RodCastAndPull : FishingEquipmentBase
             yield return null;
         }
 
-        currentPullTime = 0;
+        while (!isPulling)
+        {
+            currentPullTime -= 0.1f;
+            if (currentPullTime <= 0)
+            {
+                currentPullTime = 0;
+            }
+        }
+
+        currentPullTime = 0f;
 
         currentPullSpeed = pullSpeed;
 
         isPulling = false;
         pullCoroutine = null;
+        staminaBar.SetActive(false);
     }
 
     IEnumerator BreakLineCoroutine()
@@ -223,6 +231,7 @@ public class RodCastAndPull : FishingEquipmentBase
             OnLineBreak?.Invoke();
             Destroy(bobber);
             bobber = null;
+            staminaBar.SetActive(false);
             yield break;
         }
         else

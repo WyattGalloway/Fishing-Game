@@ -6,6 +6,7 @@ public class FishPoolManager : MonoBehaviour
     [SerializeField] GameObject fishPrefab;
     [SerializeField] int poolSize = 30;
     [SerializeField] Collider lakeCollider;
+    [SerializeField] FishDatabase fishDatabase;
 
     List<GameObject> fishPool = new List<GameObject>();
 
@@ -15,12 +16,6 @@ public class FishPoolManager : MonoBehaviour
         {
             GameObject fish = Instantiate(fishPrefab);
             fish.SetActive(false);
-
-            FishBoidBehaviour behaviour = fish.GetComponent<FishBoidBehaviour>();
-            if (behaviour != null)
-            {
-                behaviour.Initialize(lakeCollider);
-            }
             
             fishPool.Add(fish);
         }
@@ -34,6 +29,14 @@ public class FishPoolManager : MonoBehaviour
         {
             Vector3 spawnPosition = GetRandomPointInLake(lakeCollider);
             fish.transform.position = spawnPosition;
+
+            FishBoidBehaviour behaviour = fish.GetComponent<FishBoidBehaviour>();
+            if (behaviour != null)
+            {
+                FishDataSO fishData = fishDatabase.GetRandomFish();
+                behaviour.Initialize(lakeCollider, fishData);
+            }
+
             fish.SetActive(true);
         }
     }

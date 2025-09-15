@@ -13,7 +13,7 @@ public class CameraFollow : MonoBehaviour
         UnityEngine.Rendering.DebugManager.instance.enableRuntimeUI = false;
     }
 
-    void Update()
+    void LateUpdate()
     {
 
         if (targetToFollow != null)

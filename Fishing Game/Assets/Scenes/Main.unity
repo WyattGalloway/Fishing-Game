@@ -628,7 +628,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 886251e9a18ece04ea8e61686c173e1b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  CameraDistance: 40.3
+  CameraDistance: 773.8
   DeadZoneDepth: 0
   Composition:
     ScreenPosition: {x: 0, y: 0}
@@ -671,12 +671,12 @@ MonoBehaviour:
     LookAtTarget: {fileID: 0}
     CustomLookAtTarget: 0
   Lens:
-    FieldOfView: 60.000004
-    OrthographicSize: 25.1
+    FieldOfView: 4
+    OrthographicSize: 24.5
     NearClipPlane: 0.01
     FarClipPlane: 1000
     Dutch: 0
-    ModeOverride: 1
+    ModeOverride: 2
     PhysicalProperties:
       GateFit: 2
       SensorSize: {x: 21.946, y: 16.002}
@@ -699,7 +699,7 @@ Transform:
   m_GameObject: {fileID: 259430694}
   serializedVersion: 2
   m_LocalRotation: {x: 0.53729963, y: 0, z: 0, w: 0.8433915}
-  m_LocalPosition: {x: -0.4824, y: 37.124203, z: -16.482512}
+  m_LocalPosition: {x: -0.4824, y: 701.90094, z: -326.47293}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1167,7 +1167,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &542756137
 Transform:
   m_ObjectHideFlags: 0
@@ -2100,9 +2100,9 @@ Camera:
     height: 1
   near clip plane: 0.01
   far clip plane: 1000
-  field of view: 60.000004
+  field of view: 4
   orthographic: 0
-  orthographic size: 25.1
+  orthographic size: 24.5
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -2127,7 +2127,7 @@ Transform:
   m_GameObject: {fileID: 1414436233}
   serializedVersion: 2
   m_LocalRotation: {x: 0.53729963, y: 0, z: 0, w: 0.8433915}
-  m_LocalPosition: {x: -0.4824, y: 37.124203, z: -16.482512}
+  m_LocalPosition: {x: -0.4824, y: 701.90094, z: -326.47293}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2577,7 +2577,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9b98a397747e23b478176aaf72aea160, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  chanceToCatchAnyFish: 0.787
+  caughtFish: []
 --- !u!1 &1787254933
 GameObject:
   m_ObjectHideFlags: 0
@@ -3168,6 +3168,7 @@ MonoBehaviour:
   acceleration: 3
   deceleration: 2
   rb: {fileID: 2011997793}
+  staminaBar: {fileID: 542756136}
 --- !u!114 &2011997792
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3304,6 +3305,8 @@ MonoBehaviour:
   maximumBobbersAllowed: 1
   fishDetectionRadius: 10
   currentPullSpeed: 0
+  currentPullTime: 0
+  staminaBar: {fileID: 542756136}
 --- !u!1 &2116573514
 GameObject:
   m_ObjectHideFlags: 0
@@ -3315,7 +3318,7 @@ GameObject:
   - component: {fileID: 2116573515}
   - component: {fileID: 2116573516}
   m_Layer: 0
-  m_Name: FishManager
+  m_Name: SmallFishPoolManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3351,6 +3354,7 @@ MonoBehaviour:
   fishPrefab: {fileID: 7824030701797153535, guid: 8e07aa269d1093546b1444e4d4040e4d, type: 3}
   poolSize: 150
   lakeCollider: {fileID: 145809836}
+  fishDatabase: {fileID: 11400000, guid: 72ea5aba6de5c2149844379708f768bb, type: 2}
 --- !u!1 &2117272787
 GameObject:
   m_ObjectHideFlags: 0

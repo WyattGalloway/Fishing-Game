@@ -7,7 +7,7 @@ public class CaughtFishDisplay : MonoBehaviour
     [SerializeField] TMP_Text text;
     [SerializeField] Canvas caughtFishDisplay;
     [SerializeField] RodCastAndPull rodCastAndPull;
-    List<Fish> caughtFish;
+    List<CaughtFish> caughtFish;
 
     void OnEnable()
     {
@@ -21,18 +21,23 @@ public class CaughtFishDisplay : MonoBehaviour
 
     void UpdateFishList()
     {
-        caughtFish = FishingSystem.Instance.totalCaughtFish;
+        caughtFish = FishingSystem.Instance.caughtFish;
     }
 
     public void DisplayList()
     {
-
         caughtFishDisplay.enabled = true;
         string formattedList = "";
 
+        if (caughtFish == null || caughtFish.Count == 0)
+        {
+            text.text = "No fish caught yet!";
+            return;
+        }
+
         Dictionary<string, (int count, float totalWeight)> groupedFish = new Dictionary<string, (int, float)>();
 
-        foreach (Fish fish in caughtFish)
+        foreach (CaughtFish fish in caughtFish)
         {
             if (groupedFish.ContainsKey(fish.name))
             {

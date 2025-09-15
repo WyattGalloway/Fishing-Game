@@ -14,7 +14,7 @@ public class NetBehaviour : MonoBehaviour
 
 
     [Header("Fish Logic")]
-    List<Fish> fishList;
+    List<CaughtFish> fishList;
     Coroutine fishingCoroutine;
 
     bool isOnWater;
@@ -32,7 +32,7 @@ public class NetBehaviour : MonoBehaviour
 
         if (FishingSystem.Instance != null)
         {
-            fishList = FishingSystem.Instance.availableFishPool; //instantiate the caught fish list
+            fishList = FishingSystem.Instance.caughtFish; //instantiate the caught fish list
         }
     }
 
@@ -87,12 +87,12 @@ public class NetBehaviour : MonoBehaviour
         Debug.Log($"Waiting {time} seconds to catch a fish...");
         yield return new WaitForSeconds(time);
 
-        List<Fish> caughtFishList = FishingSystem.Instance.TryCatchMultipleFish();
+        List<CaughtFish> caughtFishList = FishingSystem.Instance.caughtFish;
 
         if (caughtFishList != null)
         {
             indicatorSprite.sprite = caughtSprite; //changes indicator to a !
-            foreach (Fish fish in caughtFishList)
+            foreach (CaughtFish fish in caughtFishList)
             {
                 rb.mass += fish.weight; //adds all the masses of each fish to the nets rigidbody weight
             }

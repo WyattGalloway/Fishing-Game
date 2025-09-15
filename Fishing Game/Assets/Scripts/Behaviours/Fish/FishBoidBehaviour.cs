@@ -5,10 +5,9 @@ public class FishBoidBehaviour : MonoBehaviour
 {
     [Header("Boid Forces")]
     [SerializeField] float separationForce;
+    [SerializeField] float separationDistance;
     [SerializeField] float alignmentForce;
     [SerializeField] float cohesionForce;
-
-    [SerializeField] float separationDistance;
 
     [Header("Movement References")]
     [SerializeField] float avoidanceStrength;
@@ -18,6 +17,8 @@ public class FishBoidBehaviour : MonoBehaviour
 
     [Header("References")]
     [SerializeField] Collider lakeColllider;
+    public FishDataSO data;
+    public float currentWeight { get; private set; }
 
     List<Transform> neighbors = new();
 
@@ -63,9 +64,11 @@ public class FishBoidBehaviour : MonoBehaviour
         }
     }
 
-    public void Initialize(Collider lake)
+    public void Initialize(Collider lake, FishDataSO fishData)
     {
         lakeColllider = lake;
+        data = fishData;
+        currentWeight = Random.Range(data.weightRange.x, data.weightRange.y);
     }
 
     void FindNeighbors()

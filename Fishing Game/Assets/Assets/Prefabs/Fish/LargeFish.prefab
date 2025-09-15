@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 934656842071518331}
   - component: {fileID: 742249805891840315}
   m_Layer: 13
-  m_Name: TestFish_1
+  m_Name: LargeFish
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

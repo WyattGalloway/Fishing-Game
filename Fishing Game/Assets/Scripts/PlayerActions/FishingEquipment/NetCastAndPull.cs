@@ -19,16 +19,13 @@ public class NetCastAndPull : FishingEquipmentBase
 
     List<GameObject> activeNets = new List<GameObject>();
 
-    protected override void Awake()
+    protected void Awake()
     {
-        base.Awake();
         cameraFollow = mainCamera.GetComponent<CameraFollow>();
     }
 
     protected override void CastObject()
     {
-        FishingSystem.Instance.chanceToCatchAnyFish = chanceToCatchAnyFish;
-
         Vector3 netSpawnPosition = transform.position + transform.forward + (Vector3.up * 2f);
         net = Instantiate(netPrefab, netSpawnPosition, Quaternion.identity);
 
