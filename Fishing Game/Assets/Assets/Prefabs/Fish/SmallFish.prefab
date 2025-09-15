@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 6421617049963037347}
   - component: {fileID: 7860340235885409248}
   - component: {fileID: 1894628433661963584}
+  - component: {fileID: 2559490281423699083}
   m_Layer: 13
   m_Name: SmallFish
   m_TagString: Fish
@@ -122,10 +123,30 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   separationForce: 5
+  separationDistance: 3
   alignmentForce: 5
   cohesionForce: 0.5
-  separationDistance: 3
   avoidanceStrength: 1.2
+  avoidanceBuffer: 0
   moveSpeed: 2
   separationRadius: 3
   lakeColllider: {fileID: 0}
+  data: {fileID: 0}
+--- !u!114 &2559490281423699083
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7824030701797153535}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 64636a0e00f85414ea47ad0764bfe22d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  fishData: {fileID: 0}
+  bobber: {fileID: 0}
+  bobberCheckRadius: 5
+  currentHunger: 0
+  currentCuriosity: 0
+  currentWeight: 0

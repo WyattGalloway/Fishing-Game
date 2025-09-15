@@ -1,15 +1,21 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class BobberBehaviour : MonoBehaviour
 {
+    public event Action<BobberBehaviour> OnBobberDestroyed;
+    public event Action<FishAIBehaviour> OnFishHooked;
+
     [Header("References")]
     [SerializeField] GameObject indicator;
     [SerializeField] Sprite caughtSprite;
     [SerializeField] LayerMask waterLayer;
     [SerializeField] Image indicatorSprite;
+    public Transform hookPoint;
 
     [Header("Settings")]
     [SerializeField] float detectionRadius = 5f;
@@ -17,7 +23,11 @@ public class BobberBehaviour : MonoBehaviour
     Rigidbody rb;
     bool isOnWater;
     bool isFishing;
-    FishBoidBehaviour hookedFish;
+    public bool isClaimed;
+
+    FishAIBehaviour hookedFish;
+
+    List<FishAIBehaviour> registeredFish = new();
 
     void Start()
     {
@@ -35,7 +45,6 @@ public class BobberBehaviour : MonoBehaviour
             if (!isFishing)
             {
                 isFishing = true;
-                StartCoroutine(StartFishingRoutine());
             }
         }
         else if (!currentlyOnWater && isOnWater && !isFishing)
@@ -52,58 +61,32 @@ public class BobberBehaviour : MonoBehaviour
         return Physics.Raycast(transform.position, Vector3.down, 1f, waterLayer);
     }
 
-    IEnumerator StartFishingRoutine()
+    public void HookFish(FishAIBehaviour fish)
     {
-        float scanDelay = Random.Range(2f, 6f);
-        yield return new WaitForSeconds(scanDelay);
+        if (hookedFish != null || fish == null) return;
 
-        FishBoidBehaviour fish = ScanForNearbyFish();
-
-        if (fish != null)
-        {
-            float biteDelay = 2f; //will make more variable in the future
-
-            yield return new WaitForSeconds(biteDelay);
-
-            HookFish(fish);
-        }
-        else
-        {
-            Debug.Log("No fish nearby");
-            isFishing = false;
-            indicator.SetActive(false);
-        }
-    }
-
-    FishBoidBehaviour ScanForNearbyFish()
-    {
-        Collider[] hits = Physics.OverlapSphere(transform.position, detectionRadius);
-
-        foreach (var hit in hits)
-        {
-            if (hit.TryGetComponent<FishBoidBehaviour>(out var fish))
-            {
-                if (Random.value < fish.data.curiousity)
-                {
-                    return fish;
-                }
-            }
-        }
-
-        return null;
-    }
-
-    void HookFish(FishBoidBehaviour fish)
-    {
         hookedFish = fish;
-        fish.enabled = false;
-        fish.transform.SetParent(transform);
-        fish.transform.localPosition = Vector3.zero;
-
+        isClaimed = true;
         indicatorSprite.sprite = caughtSprite;
 
-        float weight = fish.currentWeight;
-        FishingSystem.Instance.RecordCaughtFish(fish.data, weight);
+        FishBoidBehaviour boid = fish.GetComponent<FishBoidBehaviour>();
+
+        if (boid != null)
+        {
+            boid.enabled = false;
+        }
+
+        FishingSystem.Instance.RecordCaughtFish(fish.Data, fish.Weight);
+
+        OnFishHooked?.Invoke(fish.GetComponent<FishAIBehaviour>());
+    }
+
+    public void RegisterFish(FishAIBehaviour fish)
+    {
+        if (!registeredFish.Contains(fish))
+        {
+            registeredFish.Add(fish);
+        }
     }
 
     void OnCollisionEnter(Collision collision)
@@ -116,8 +99,26 @@ public class BobberBehaviour : MonoBehaviour
             }
 
             Destroy(gameObject);
-        }       
+        }
     }
+
+    void OnDestroy()
+    {
+        OnBobberDestroyed?.Invoke(this);
+
+        Destroy(hookedFish.gameObject);
+
+        foreach (var fish in registeredFish)
+        {
+            if (fish != null)
+            {
+                fish.ClearBobber();
+            }
+        }
+
+        registeredFish.Clear();
+    }
+
 
 }
 

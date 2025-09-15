@@ -4,23 +4,23 @@ using UnityEngine;
 public class FishBoidBehaviour : MonoBehaviour
 {
     [Header("Boid Forces")]
-    [SerializeField] float separationForce;
-    [SerializeField] float separationDistance;
-    [SerializeField] float alignmentForce;
-    [SerializeField] float cohesionForce;
+    [SerializeField] float separationForce; //how quickly fish are separated
+    [SerializeField] float separationDistance; //at what distance the separation is determined
+    [SerializeField] float alignmentForce; //how quickly fish are aligned with each other
+    [SerializeField] float cohesionForce; //how quickly fish will move together
 
     [Header("Movement References")]
-    [SerializeField] float avoidanceStrength;
-    [SerializeField] float avoidanceBuffer;
-    [SerializeField] float moveSpeed;
-    [SerializeField] float separationRadius;
+    [SerializeField] float avoidanceStrength; //how strongly the avoidance to the bounds is
+    [SerializeField] float avoidanceBuffer; //how far the fish will begin to avoid the bounds
+    [SerializeField] float moveSpeed; //how fast the fish move
+    [SerializeField] float separationRadius; //the radius of the separation sphere
 
     [Header("References")]
-    [SerializeField] Collider lakeColllider;
-    public FishDataSO data;
-    public float currentWeight { get; private set; }
+    [SerializeField] Collider lakeColllider; //bounds of the lake
+    public FishDataSO data; //data the fish need to be set. Name, weight, etc.
+    public float currentWeight { get; private set; } //can set the weight of each fish
 
-    List<Transform> neighbors = new();
+    List<Transform> neighbors = new(); //list of neighbors fish will separate from
 
     void Update()
     {
@@ -28,6 +28,7 @@ public class FishBoidBehaviour : MonoBehaviour
 
         Vector3 move = Vector3.zero;
 
+        //ensures fish dont stay static if no neighbors are found
         Vector3 wander = new Vector3(
             Mathf.PerlinNoise(Time.time * 0.5f, transform.position.x) - 0.5f,
             Mathf.PerlinNoise(Time.time * 0.5f, transform.position.y) - 0.5f,
@@ -38,6 +39,7 @@ public class FishBoidBehaviour : MonoBehaviour
 
         move += wander;
 
+        //starts boid when neighbors are present
         if (neighbors.Count > 0)
         {
             Vector3 separation = CalculateSeparation();
@@ -47,17 +49,20 @@ public class FishBoidBehaviour : MonoBehaviour
             move = separation + alignment + cohesion;
         }
 
+        //avoid the bounds to prevent clumping on the edges
         move += CalculateBoundsAvoidance();
 
+        //moves fish forward if they havent moved yet
         if (move.magnitude < 0.01f)
             move = transform.forward;
 
         move = move.normalized * moveSpeed;
         
+        //Adds all previous instructions of move to the position to move the fish
         transform.position += move * Time.deltaTime;
-        transform.position = ClampToBounds(transform.position);
+        transform.position = ClampToBounds(transform.position); //ensures fish dont leave bounds
         
-
+        //ensures the forward is inline with all other fish
         if (move != Vector3.zero)
         {
             transform.forward = Vector3.Lerp(transform.forward, move.normalized, Time.deltaTime * 5f);
@@ -66,6 +71,7 @@ public class FishBoidBehaviour : MonoBehaviour
 
     public void Initialize(Collider lake, FishDataSO fishData)
     {
+        //initializes the data the fish need, since theyre prefabs and cant be assigned in inspector
         lakeColllider = lake;
         data = fishData;
         currentWeight = Random.Range(data.weightRange.x, data.weightRange.y);
@@ -73,13 +79,14 @@ public class FishBoidBehaviour : MonoBehaviour
 
     void FindNeighbors()
     {
-        neighbors.Clear();
+        neighbors.Clear(); //clear list to ensure no overlap
 
         Collider[] nearbyNeighbors = Physics.OverlapSphere(transform.position, separationRadius);
 
+        //takes the collider array and adds fish in the collider to the neighbor list
         foreach (Collider col in nearbyNeighbors)
         {
-            if (col.gameObject != gameObject && col.CompareTag("Fish"))
+            if (col.gameObject != gameObject && col.CompareTag("Fish")) //TODO: change fish to fish of same type
             {
                 neighbors.Add(col.transform);
             }
@@ -92,6 +99,7 @@ public class FishBoidBehaviour : MonoBehaviour
 
         Vector3 separationDirection = Vector3.zero;
 
+        //gets the distance from the neighbor and ensures the fish are an appropriate distance
         foreach (Transform neighbor in neighbors)
         {
             Vector3 separation = transform.position - neighbor.transform.position;
@@ -103,6 +111,7 @@ public class FishBoidBehaviour : MonoBehaviour
             }
         }
 
+        //return the separation direction and ensures that the fish are separated by force
         return separationDirection.normalized * separationForce;
     }
 
@@ -112,12 +121,13 @@ public class FishBoidBehaviour : MonoBehaviour
 
         Vector3 averageDirection = Vector3.zero;
 
+        //ensures each fish goes in the same direction
         foreach (Transform neighbor in neighbors)
         {
             averageDirection += neighbor.forward;
         }
 
-        averageDirection /= neighbors.Count;
+        averageDirection /= neighbors.Count; //averages out the direction by the count of neightbors
 
         return averageDirection.normalized * alignmentForce;
     }
@@ -128,12 +138,13 @@ public class FishBoidBehaviour : MonoBehaviour
 
         Vector3 centerOfMass = Vector3.zero;
 
+        //makes each fish clump have its own center of mass
         foreach (Transform neighbor in neighbors)
         {
             centerOfMass += neighbor.position;
         }
 
-        centerOfMass /= neighbors.Count;
+        centerOfMass /= neighbors.Count; //average out the center of mass between all neighbors
 
         Vector3 cohesionDirection = (centerOfMass - transform.position).normalized;
 
@@ -150,7 +161,7 @@ public class FishBoidBehaviour : MonoBehaviour
         float buffer = avoidanceBuffer;
 
         Vector3 pos = transform.position;
-
+        // gets the x,y,z of each fish and calculates its avoidance based off its proximity to the bounds of the swimming area
         // X-axis
         if (pos.x < bounds.min.x + buffer)
             avoidance += Vector3.right * (1f - (pos.x - bounds.min.x) / buffer);
@@ -179,6 +190,7 @@ public class FishBoidBehaviour : MonoBehaviour
 
         Bounds bounds = lakeColllider.bounds;
 
+        //ensure the fish dont leave the bounds of the lake by clamping x,y,z
         position.x = Mathf.Clamp(position.x, bounds.min.x, bounds.max.x);
         position.y = Mathf.Clamp(position.y, bounds.min.y, bounds.max.y);
         position.z = Mathf.Clamp(position.z, bounds.min.z, bounds.max.z);
