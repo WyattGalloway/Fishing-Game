@@ -11,23 +11,22 @@ public class BobberBehaviour : MonoBehaviour
     public event Action<FishAIBehaviour> OnFishHooked;
 
     [Header("References")]
-    [SerializeField] GameObject indicator;
-    [SerializeField] Sprite caughtSprite;
-    [SerializeField] LayerMask waterLayer;
-    [SerializeField] Image indicatorSprite;
-    public Transform hookPoint;
+    [SerializeField] GameObject indicator; //arrow indicator full gameobject
+    [SerializeField] Sprite caughtSprite; //caught indicator
+    [SerializeField] LayerMask waterLayer; //layer that the water is on
+    [SerializeField] Image indicatorSprite; //the actual image of the arrow indicator
+    [SerializeField] Transform hookPoint; //the actual hook point in space of the bobbers game object
+    public Transform HookPoint => hookPoint; //public getter of the hookPoint, to keep it encapsulated
 
-    [Header("Settings")]
-    [SerializeField] float detectionRadius = 5f;
+    [Header("References")]
+    Rigidbody rb; //bobbers rigidbody
+    bool wasOnWater; //checks if on the water layer
+    bool isFishing; //checks for fishing
+    public bool IsClaimed { get; set; } //public getter of a private variable
 
-    Rigidbody rb;
-    bool isOnWater;
-    bool isFishing;
-    public bool isClaimed;
+    FishAIBehaviour hookedFish; //gets the hooked fish
 
-    FishAIBehaviour hookedFish;
-
-    List<FishAIBehaviour> registeredFish = new();
+    List<FishAIBehaviour> registeredFish = new(); //list of fish registered to the hook
 
     void Start()
     {
@@ -36,9 +35,9 @@ public class BobberBehaviour : MonoBehaviour
 
     void Update()
     {
-        bool currentlyOnWater = CheckIfOnWater();
+        bool currentlyOnWater = CheckIfOnWater(); //water check
 
-        if (currentlyOnWater && !isOnWater && !isFishing)
+        if (currentlyOnWater && !wasOnWater && !isFishing) //checks if the raycast is true, but not on the water and not currently actively fishing
         {
             indicator.SetActive(true);
 
@@ -47,13 +46,13 @@ public class BobberBehaviour : MonoBehaviour
                 isFishing = true;
             }
         }
-        else if (!currentlyOnWater && isOnWater && !isFishing)
+        else if (!currentlyOnWater && wasOnWater && !isFishing) //indicator isnt set while not on the water
         {
             indicator.SetActive(false);
             isFishing = false;
         }
 
-        isOnWater = currentlyOnWater;
+        wasOnWater = currentlyOnWater;
     }
 
     bool CheckIfOnWater()
@@ -63,22 +62,24 @@ public class BobberBehaviour : MonoBehaviour
 
     public void HookFish(FishAIBehaviour fish)
     {
-        if (hookedFish != null || fish == null) return;
+        if (hookedFish != null || fish == null) return; //if no fish, break method
 
+        //handles fish setting and claiming
         hookedFish = fish;
-        isClaimed = true;
-        indicatorSprite.sprite = caughtSprite;
+        IsClaimed = true;
+
+        //if fish is claimed and set, then the indicator changes
+        if (indicatorSprite != null)
+            indicatorSprite.sprite = caughtSprite;
 
         FishBoidBehaviour boid = fish.GetComponent<FishBoidBehaviour>();
 
         if (boid != null)
         {
-            boid.enabled = false;
+            boid.enabled = false; //turn off boid behaviour for caught fish
         }
 
-        FishingSystem.Instance.RecordCaughtFish(fish.Data, fish.Weight);
-
-        OnFishHooked?.Invoke(fish.GetComponent<FishAIBehaviour>());
+        OnFishHooked?.Invoke(fish.GetComponent<FishAIBehaviour>()); //invoke hooking behaviour
     }
 
     public void RegisterFish(FishAIBehaviour fish)
@@ -91,6 +92,7 @@ public class BobberBehaviour : MonoBehaviour
 
     void OnCollisionEnter(Collision collision)
     {
+        //FIX: Destroys fish and bobber (not performant)
         if (collision.gameObject.CompareTag("Player"))
         {
             if (hookedFish != null)
@@ -104,9 +106,15 @@ public class BobberBehaviour : MonoBehaviour
 
     void OnDestroy()
     {
+        //destroy action
         OnBobberDestroyed?.Invoke(this);
 
-        Destroy(hookedFish.gameObject);
+        if (hookedFish != null)
+        {
+            FishingSystem.Instance.RecordCaughtFish(hookedFish.Data, hookedFish.Weight);
+            Destroy(hookedFish.gameObject);
+        }
+        
 
         foreach (var fish in registeredFish)
         {

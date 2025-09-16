@@ -15,4 +15,4 @@ MonoBehaviour:
   fishName: Small Fish
   weightRange: {x: 1, y: 5}
   curiousity: 3
-  hunger: 90.00089
+  hunger: 0

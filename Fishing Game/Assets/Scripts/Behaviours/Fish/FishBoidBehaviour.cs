@@ -22,6 +22,8 @@ public class FishBoidBehaviour : MonoBehaviour
 
     List<Transform> neighbors = new(); //list of neighbors fish will separate from
 
+    public bool IsRoaming { get; set; } = true;
+
     void Update()
     {
         FindNeighbors();
@@ -37,7 +39,8 @@ public class FishBoidBehaviour : MonoBehaviour
 
         wander = wander.normalized * 0.5f;
 
-        move += wander;
+        if (IsRoaming)
+            move += wander;
 
         //starts boid when neighbors are present
         if (neighbors.Count > 0)
@@ -47,6 +50,7 @@ public class FishBoidBehaviour : MonoBehaviour
             Vector3 cohesion = CalculateCohesion();
 
             move = separation + alignment + cohesion;
+            IsRoaming = false;
         }
 
         //avoid the bounds to prevent clumping on the edges
