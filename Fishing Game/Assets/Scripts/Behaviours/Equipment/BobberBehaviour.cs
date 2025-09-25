@@ -8,7 +8,7 @@ using UnityEngine.UI;
 public class BobberBehaviour : MonoBehaviour
 {
     public event Action<BobberBehaviour> OnBobberDestroyed;
-    public event Action<FishAIBehaviour> OnFishHooked;
+    public event Action<IFish> OnFishHooked;
 
     [Header("References")]
     [SerializeField] GameObject indicator; //arrow indicator full gameobject
@@ -24,9 +24,9 @@ public class BobberBehaviour : MonoBehaviour
     bool isFishing; //checks for fishing
     public bool IsClaimed { get; set; } //public getter of a private variable
 
-    FishAIBehaviour hookedFish; //gets the hooked fish
+    IFish hookedFish; //gets the hooked fish
 
-    List<FishAIBehaviour> registeredFish = new(); //list of fish registered to the hook
+    List<IFish> registeredFish = new(); //list of fish registered to the hook
 
     void Start()
     {
@@ -60,7 +60,7 @@ public class BobberBehaviour : MonoBehaviour
         return Physics.Raycast(transform.position, Vector3.down, 1f, waterLayer);
     }
 
-    public void HookFish(FishAIBehaviour fish)
+    public void HookFish(IFish fish)
     {
         if (hookedFish != null || fish == null) return; //if no fish, break method
 
@@ -72,17 +72,15 @@ public class BobberBehaviour : MonoBehaviour
         if (indicatorSprite != null)
             indicatorSprite.sprite = caughtSprite;
 
-        FishBoidBehaviour boid = fish.GetComponent<FishBoidBehaviour>();
-
-        if (boid != null)
+        if (fish is MonoBehaviour fishMono && fishMono.TryGetComponent<FishBoidBehaviour>(out var boid))
         {
-            boid.enabled = false; //turn off boid behaviour for caught fish
+            boid.enabled = false;
         }
 
-        OnFishHooked?.Invoke(fish.GetComponent<FishAIBehaviour>()); //invoke hooking behaviour
+        OnFishHooked?.Invoke(fish);
     }
 
-    public void RegisterFish(FishAIBehaviour fish)
+    public void RegisterFish(IFish fish)
     {
         if (!registeredFish.Contains(fish))
         {
@@ -95,9 +93,9 @@ public class BobberBehaviour : MonoBehaviour
         //FIX: Destroys fish and bobber (not performant)
         if (collision.gameObject.CompareTag("Player"))
         {
-            if (hookedFish != null)
+            if (hookedFish != null && hookedFish is MonoBehaviour fishMono)
             {
-                Destroy(hookedFish.gameObject);
+                Destroy(fishMono.gameObject);
             }
 
             Destroy(gameObject);
@@ -111,16 +109,17 @@ public class BobberBehaviour : MonoBehaviour
 
         if (hookedFish != null)
         {
-            FishingSystem.Instance.RecordCaughtFish(hookedFish.Data, hookedFish.Weight);
-            Destroy(hookedFish.gameObject);
+            FishingSystem.Instance.RecordCaughtFish(hookedFish.Data, hookedFish.Weight, hookedFish.Length);
+            if (hookedFish is MonoBehaviour fishMono)
+                Destroy(fishMono.gameObject);
         }
         
 
         foreach (var fish in registeredFish)
         {
-            if (fish != null)
+            if (fish is FishPerceptionInteraction perceptionFish)
             {
-                fish.ClearBobber();
+                perceptionFish.RemoveBobber();
             }
         }
 

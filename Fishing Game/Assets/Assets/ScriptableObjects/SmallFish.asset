@@ -14,5 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   fishName: Small Fish
   weightRange: {x: 1, y: 5}
-  curiousity: 3
+  lengthRange: {x: 0.5, y: 3}
+  minimumCuriosity: 1
+  maximumCuriosity: 100
   hunger: 0

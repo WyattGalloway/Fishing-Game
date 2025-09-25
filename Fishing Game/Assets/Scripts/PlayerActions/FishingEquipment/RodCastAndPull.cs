@@ -15,8 +15,6 @@ public class RodCastAndPull : FishingEquipmentBase
     [SerializeField] Camera mainCamera;
     [SerializeField] int maximumBobbersAllowed = 1;
 
-    [SerializeField] float fishDetectionRadius = 10f;
-
     [Header("Pulling Parameters")]
     [SerializeField] float currentPullSpeed;
     public bool IsPulling => isPulling;
@@ -61,8 +59,6 @@ public class RodCastAndPull : FishingEquipmentBase
 
         Vector3 bobberSpawnPosition = transform.position + transform.forward + (Vector3.up * 2f); //spawns bobber slightly above the front of the ship to avoid collisions
         bobber = Instantiate(bobberPrefab, bobberSpawnPosition, Quaternion.identity);
-
-        NotifyNearbyFish(bobber.transform);
 
         OnBobberSpawn?.Invoke();
 
@@ -114,20 +110,6 @@ public class RodCastAndPull : FishingEquipmentBase
         else if (!HasCastObject() && castingChargeAmount > 0f)
         {
             base.OnCastReleased(callbackContext);
-        }
-    }
-
-    void NotifyNearbyFish(Transform bobberTransform)
-    {
-        Collider[] hits = Physics.OverlapSphere(bobberTransform.position, fishDetectionRadius);
-
-        foreach (var hit in hits)
-        {
-            TestFishBehaviour fish = hit.GetComponent<TestFishBehaviour>();
-            if (fish != null)
-            {
-                fish.SetBobberTarget(bobberTransform);
-            }
         }
     }
 

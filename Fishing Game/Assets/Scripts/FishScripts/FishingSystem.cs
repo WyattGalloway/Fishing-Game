@@ -15,10 +15,10 @@ public class FishingSystem : MonoBehaviour
         else Destroy(gameObject);
     }
 
-    public void RecordCaughtFish(FishDataSO fishData, float weight)
+    public void RecordCaughtFish(FishDataSO fishData, float weight, float length)
     {
         //adds caught fish into a list
-        CaughtFish fish = new CaughtFish(fishData.name, weight);
+        CaughtFish fish = new CaughtFish(fishData.name, weight, length);
         caughtFish.Add(fish);
         OnFishCaught?.Invoke();
     }
@@ -31,9 +31,11 @@ public struct CaughtFish
 {
     public string name;
     public float weight;
-    public CaughtFish(string name, float weight)
+    public float length;
+    public CaughtFish(string name, float weight, float length)
     {
         this.name = name;
         this.weight = weight;
+        this.length = length;
     }
 }

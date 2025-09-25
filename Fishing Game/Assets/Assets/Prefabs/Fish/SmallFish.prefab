@@ -13,7 +13,9 @@ GameObject:
   - component: {fileID: 6421617049963037347}
   - component: {fileID: 7860340235885409248}
   - component: {fileID: 1894628433661963584}
-  - component: {fileID: 2559490281423699083}
+  - component: {fileID: 3554480813878737938}
+  - component: {fileID: 383642516328906524}
+  - component: {fileID: 7831024010926153350}
   m_Layer: 13
   m_Name: SmallFish
   m_TagString: Fish
@@ -132,7 +134,7 @@ MonoBehaviour:
   separationRadius: 2
   lakeColllider: {fileID: 0}
   data: {fileID: 0}
---- !u!114 &2559490281423699083
+--- !u!114 &3554480813878737938
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -141,11 +143,38 @@ MonoBehaviour:
   m_GameObject: {fileID: 7824030701797153535}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 64636a0e00f85414ea47ad0764bfe22d, type: 3}
+  m_Script: {fileID: 11500000, guid: 500a9a2f8da57534ead5f4083c192867, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   fishData: {fileID: 0}
   currentHunger: 0
   currentCuriosity: 0
   currentWeight: 0
-  bobberCheckRadius: 5
+  currentLength: 0
+--- !u!114 &383642516328906524
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7824030701797153535}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7d8d2b385f16719449dc5c17dd4c1efe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bobberCheckRadius: 10
+--- !u!114 &7831024010926153350
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7824030701797153535}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9f22474ed8fd1124faa542166563dedd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  investigateRadius: 10
+  nibbleRadius: 2

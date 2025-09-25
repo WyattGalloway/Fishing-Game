@@ -538,7 +538,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 5, y: 0.3}
+  m_SizeDelta: {x: 10, y: 0.6}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &214369014
 MonoBehaviour:
@@ -1176,8 +1176,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 542756136}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: 0.5372997, y: -0, z: -0, w: 0.8433914}
+  m_LocalPosition: {x: 0.1, y: -1.2, z: -2.57}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1443,7 +1443,6 @@ MonoBehaviour:
   bobberPrefab: {fileID: 1851079398324335261, guid: b0abbc144db49dd4eb6fac3c56d381e6, type: 3}
   mainCamera: {fileID: 1414436235}
   maximumBobbersAllowed: 1
-  fishDetectionRadius: 10
   currentPullSpeed: 0
   currentPullTime: 0
   staminaBar: {fileID: 542756136}
@@ -2060,7 +2059,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 5, y: 0.3}
+  m_SizeDelta: {x: 10, y: 0.6}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1185884584
 MonoBehaviour:
@@ -2597,7 +2596,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: -0.001, y: -0.86}
-  m_SizeDelta: {x: 5, y: 5}
+  m_SizeDelta: {x: 10, y: 10}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1557438475
 MonoBehaviour:
@@ -3552,7 +3551,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 5, y: 0.3}
+  m_SizeDelta: {x: 10, y: 0.6}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2135240456
 MonoBehaviour:

@@ -35,25 +35,11 @@ public class CaughtFishDisplay : MonoBehaviour
             return;
         }
 
-        Dictionary<string, (int count, float totalWeight)> groupedFish = new Dictionary<string, (int, float)>();
-
         foreach (CaughtFish fish in caughtFish)
         {
-            if (groupedFish.ContainsKey(fish.name))
-            {
-                var entry = groupedFish[fish.name];
-                groupedFish[fish.name] = (entry.count + 1, entry.totalWeight + fish.weight);
-            }
-            else
-            {
-                groupedFish.Add(fish.name, (1, fish.weight));
-            }
+            formattedList += $"{fish.name} - {fish.weight:F2} lbs, {fish.length:F2} inches.\n";
         }
-
-        foreach (var entry in groupedFish)
-        {
-            formattedList += $"{entry.Value.count} {entry.Key}(s) weighing a total of {entry.Value.totalWeight:F2} lbs\n";
-        }
+        
         text.text = formattedList;
     }
 

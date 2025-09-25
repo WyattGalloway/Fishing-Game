@@ -37,15 +37,13 @@ public class FishPoolManager : MonoBehaviour
             Vector3 spawnPosition = GetRandomPointInLake(lakeCollider);
             fish.transform.position = spawnPosition;
             
-            //ensuring fish have the data they need when being spawned
-            FishBoidBehaviour behaviour = fish.GetComponent<FishBoidBehaviour>();
-            FishAIBehaviour fishAI = fish.GetComponent<FishAIBehaviour>();
-            if (behaviour != null && fishAI != null)
-            {
-                FishDataSO fishData = fishDatabase.GetRandomFish();
-                behaviour.Initialize(lakeCollider, fishData);
-                fishAI.Initialize(fishData);
-            }
+            FishDataSO fishData = fishDatabase.GetRandomFish();
+
+            if (fish.TryGetComponent(out FishBoidBehaviour boid))
+                boid.Initialize(lakeCollider, fishData);
+
+            if (fish.TryGetComponent(out FishPerceptionInteraction perceptionInteraction))
+                perceptionInteraction.GetComponent<FishStats>().Initialize(fishData);
 
             fish.SetActive(true); //activate the fish in the list
         }
