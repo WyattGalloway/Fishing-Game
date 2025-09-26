@@ -8,11 +8,15 @@ public class FishAIController : MonoBehaviour
     [Header("Hook Interactions")]
     [SerializeField] float investigateRadius;
     [SerializeField] float nibbleRadius;
+    [SerializeField] int maximumAmountOfNibbles;
+    [SerializeField] int remainingNibbles;
+    public int RemainingNibbles => remainingNibbles;
 
     [Header("References")]
     FishBoidBehaviour boid;
     FishPerceptionInteraction perceptionInteraction;
     FishStats fishStats;
+    bool isNibbleCooldownActive = false;
     Coroutine activeCoroutine;
 
     void Awake()
@@ -21,6 +25,8 @@ public class FishAIController : MonoBehaviour
         perceptionInteraction = GetComponent<FishPerceptionInteraction>();
         fishStats = GetComponent<FishStats>();
         investigateRadius = perceptionInteraction.BobberCheckRadius / 25;
+        maximumAmountOfNibbles = Random.Range(2, 6);
+        remainingNibbles = maximumAmountOfNibbles;
     }
 
     void OnEnable()
@@ -48,7 +54,7 @@ public class FishAIController : MonoBehaviour
         if (bobber == null) return;
 
 
-        activeCoroutine = StartCoroutine(InvestigateRoutine(hookPoint,bobber));
+        activeCoroutine = StartCoroutine(InvestigateRoutine(hookPoint, bobber));
     }
 
     void StartNibble(Transform hookPoint, BobberBehaviour bobber)
@@ -85,9 +91,8 @@ public class FishAIController : MonoBehaviour
             //handles fishes movement while investigating
             Vector3 moveDirection = (hookPoint.transform.position - transform.position).normalized;
             Quaternion targetRotation = Quaternion.LookRotation(moveDirection, Vector3.up);
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime);
-
-            transform.position += moveDirection * moveSpeed * Time.deltaTime;
+            transform.rotation = Quaternion.SlerpUnclamped(transform.rotation, targetRotation, Time.deltaTime);
+            transform.position += transform.forward * moveSpeed * Time.deltaTime;
 
             if (Vector3.Distance(transform.position, hookPoint.position) <= nibbleRadius)
                 perceptionInteraction.RequestNibble(hookPoint, bobber);
@@ -113,7 +118,7 @@ public class FishAIController : MonoBehaviour
         while (bobber != null && bobber.HookPoint != null)
         {
             Vector3 targetPos = bobber.HookPoint.position;
-            Quaternion targetRotation = Quaternion.LookRotation(-bobber.transform.up);
+            Quaternion targetRotation = Quaternion.LookRotation(bobber.transform.up);
 
             transform.position = Vector3.Lerp(transform.position, targetPos, Time.deltaTime * followSpeed);
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * rotationSpeed);
@@ -129,6 +134,13 @@ public class FishAIController : MonoBehaviour
     {
         boid.IsRoaming = false;
 
+        if (remainingNibbles <= 0)
+        {
+            if (!isNibbleCooldownActive)
+                StartCoroutine(NibbleCooldownTimer());
+            yield break;
+        }
+
         int maxBites = Random.Range(2, 5); //random value between 2 and 5(exclusive) that the fish will attempt to nibble at the hook
         int currentBites = 0;
         float biteInterval = Random.Range(0.5f, 3f); //random amount of time that the nibble will happen between .5 and 3(exclusive) seconds
@@ -136,20 +148,32 @@ public class FishAIController : MonoBehaviour
         while (currentBites < maxBites && hookPoint != null)
         {
             float time = 0f;
-            Vector3 startPos = transform.position;
+            Vector3 offset = Random.insideUnitSphere * 0.2f;
+            Vector3 startPosition = transform.position;
+            Vector3 targetPositon = hookPoint.position + offset;
 
             while (time < 1f)
             {
                 time += Time.deltaTime * 2f;
-                transform.position = Vector3.Lerp(startPos, hookPoint.position, time); //enact nibbling behaviour
+
+                transform.position = Vector3.Lerp(startPosition, targetPositon, time); //enact nibbling behaviour
+                Vector3 direction = (targetPositon - transform.position).normalized;
+
+                if (direction != Vector3.zero)
+                {
+                    Quaternion targetRotation = Quaternion.LookRotation(direction, Vector3.up);
+                    transform.rotation = Quaternion.SlerpUnclamped(transform.rotation, targetRotation, Time.deltaTime * 5f);
+                }
+
                 yield return null;
             }
 
             currentBites++; //iterate bites
+            remainingNibbles--;
             fishStats.ModifyHunger(-10f);
             fishStats.ModifyCuriosity(-2f);
 
-            if (fishStats.Hunger <= 20 || Random.value > fishStats.Curiosity)
+            if (fishStats.Hunger <= 20 || Random.value > fishStats.Curiosity || remainingNibbles <= 0)
             {
                 bobber.IsClaimed = false;
                 perceptionInteraction.RemoveBobber();
@@ -164,9 +188,15 @@ public class FishAIController : MonoBehaviour
         if (bobber != null)
         {
             bobber.HookFish(perceptionInteraction);
-            perceptionInteraction.RequestFollowBobber(bobber);       
+            perceptionInteraction.RequestFollowBobber(bobber);
         }
 
         activeCoroutine = null;
+    }
+
+    IEnumerator NibbleCooldownTimer()
+    {
+        yield return new WaitForSeconds(200f);
+        remainingNibbles = maximumAmountOfNibbles;
     }
 }

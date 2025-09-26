@@ -124,14 +124,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 239eb2c826697d041a2e7c3c9ac0ebe1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  separationForce: 3.45
-  separationDistance: 1.5
-  alignmentForce: 2
+  separationForce: 5
+  separationDistance: 1
+  alignmentForce: 5
   cohesionForce: 0.5
-  avoidanceStrength: 1.2
+  avoidanceStrength: 2
   avoidanceBuffer: 0.5
   moveSpeed: 2
-  separationRadius: 2
+  separationRadius: 1
   lakeColllider: {fileID: 0}
   data: {fileID: 0}
 --- !u!114 &3554480813878737938
@@ -148,6 +148,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   fishData: {fileID: 0}
   currentHunger: 0
+  baseCuriosity: 0
   currentCuriosity: 0
   currentWeight: 0
   currentLength: 0
@@ -163,7 +164,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7d8d2b385f16719449dc5c17dd4c1efe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bobberCheckRadius: 10
+  bobberCheckRadius: 5
 --- !u!114 &7831024010926153350
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -176,5 +177,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9f22474ed8fd1124faa542166563dedd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  investigateRadius: 10
+  investigateRadius: 5
   nibbleRadius: 2
+  maximumAmountOfNibbles: 0
+  remainingNibbles: 0

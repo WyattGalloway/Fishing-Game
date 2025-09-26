@@ -23,6 +23,7 @@ public class BobberBehaviour : MonoBehaviour
     bool wasOnWater; //checks if on the water layer
     bool isFishing; //checks for fishing
     public bool IsClaimed { get; set; } //public getter of a private variable
+    public bool IsInWater { get; private set; }
 
     IFish hookedFish; //gets the hooked fish
 
@@ -45,11 +46,14 @@ public class BobberBehaviour : MonoBehaviour
             {
                 isFishing = true;
             }
+
+            IsInWater = true;
         }
         else if (!currentlyOnWater && wasOnWater && !isFishing) //indicator isnt set while not on the water
         {
             indicator.SetActive(false);
             isFishing = false;
+            IsInWater = false;
         }
 
         wasOnWater = currentlyOnWater;
@@ -107,19 +111,20 @@ public class BobberBehaviour : MonoBehaviour
         //destroy action
         OnBobberDestroyed?.Invoke(this);
 
-        if (hookedFish != null)
-        {
-            FishingSystem.Instance.RecordCaughtFish(hookedFish.Data, hookedFish.Weight, hookedFish.Length);
-            if (hookedFish is MonoBehaviour fishMono)
-                Destroy(fishMono.gameObject);
-        }
-        
-
         foreach (var fish in registeredFish)
         {
             if (fish is FishPerceptionInteraction perceptionFish)
             {
                 perceptionFish.RemoveBobber();
+            }
+        }
+
+        if (hookedFish != null)
+        {
+            if (hookedFish is MonoBehaviour fishMono && fishMono != null)
+            {
+                FishingSystem.Instance.RecordCaughtFish(hookedFish.Data, hookedFish.Weight, hookedFish.Length);
+                Destroy(fishMono.gameObject);
             }
         }
 

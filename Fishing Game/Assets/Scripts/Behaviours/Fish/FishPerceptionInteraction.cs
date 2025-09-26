@@ -42,9 +42,11 @@ public class FishPerceptionInteraction : MonoBehaviour, IFish
             BobberBehaviour bobber = collider.GetComponent<BobberBehaviour>();
             if (bobber == null || bobber.IsClaimed) continue;
 
+            if (TryGetComponent<FishAIController>(out var ai) && ai.RemainingNibbles <= 0) continue;
+
             float curiousityFactor = fishStats.Curiosity * Mathf.Clamp01(fishStats.Hunger / 100f);
 
-            if (Random.value < curiousityFactor)
+            if (Random.value < curiousityFactor && bobber.IsInWater)
             {
                 SetBobber(bobber);
                 bobber.IsClaimed = true;

@@ -67,7 +67,7 @@ public class FishBoidBehaviour : MonoBehaviour
         transform.position = ClampToBounds(transform.position); //ensures fish dont leave bounds
         
         //ensures the forward is inline with all other fish
-        if (move != Vector3.zero)
+        if (move != Vector3.zero && IsRoaming)
         {
             transform.forward = Vector3.Lerp(transform.forward, move.normalized, Time.deltaTime * 5f);
         }
