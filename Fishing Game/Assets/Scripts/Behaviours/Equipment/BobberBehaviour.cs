@@ -99,7 +99,7 @@ public class BobberBehaviour : MonoBehaviour
         {
             if (hookedFish != null && hookedFish is MonoBehaviour fishMono)
             {
-                Destroy(fishMono.gameObject);
+                fishMono.gameObject.SetActive(false);
             }
 
             Destroy(gameObject);

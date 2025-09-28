@@ -3385,6 +3385,7 @@ MonoBehaviour:
   fishPrefab: {fileID: 7824030701797153535, guid: 8e07aa269d1093546b1444e4d4040e4d, type: 3}
   lakeCollider: {fileID: 145809836}
   fishDatabase: {fileID: 11400000, guid: 72ea5aba6de5c2149844379708f768bb, type: 2}
+  clusterRadius: 0
 --- !u!1 &2117272787
 GameObject:
   m_ObjectHideFlags: 0

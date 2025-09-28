@@ -10,7 +10,7 @@ public class FishAIController : MonoBehaviour
     [SerializeField] float nibbleRadius;
     [SerializeField] int maximumAmountOfNibbles;
     [SerializeField] int remainingNibbles;
-    public int RemainingNibbles => remainingNibbles;
+    [SerializeField] public int RemainingNibbles => remainingNibbles;
 
     [Header("References")]
     FishBoidBehaviour boid;
@@ -43,9 +43,10 @@ public class FishAIController : MonoBehaviour
         perceptionInteraction.OnHooked -= StartFollowBobber;
     }
 
+    #region Behaviours
     void StartInvestigate(Transform hookPoint)
     {
-        StopActiveRoutine();
+        StopActiveRoutine(false);
 
         Debug.Log($"{name} is investigating");
 
@@ -59,30 +60,34 @@ public class FishAIController : MonoBehaviour
 
     void StartNibble(Transform hookPoint, BobberBehaviour bobber)
     {
-        StopActiveRoutine();
+        StopActiveRoutine(false);
         activeCoroutine = StartCoroutine(NibbleRoutine(hookPoint, bobber));
     }
 
     void StartFollowBobber(BobberBehaviour bobber)
     {
-        StopActiveRoutine();
+        StopActiveRoutine(false);
         activeCoroutine = StartCoroutine(FollowBobberRoutine(bobber));
     }
 
-    void StopActiveRoutine()
+    void StopActiveRoutine(bool restoreRoaming = false)
     {
         if (activeCoroutine != null)
         {
             StopCoroutine(activeCoroutine);
             activeCoroutine = null;
         }
-
-        boid.IsRoaming = true;
+        
+        if(restoreRoaming)
+            boid.IsRoaming = true;
     }
+    #endregion
 
+    #region Coroutines
     IEnumerator InvestigateRoutine(Transform hookPoint, BobberBehaviour bobber)
     {
         boid.IsRoaming = false;
+        boid.IsLingering = true;
         float moveSpeed = 2f; //the speed the fish moves when investigating the bobber
 
         //if the bobber is within a certain distance to the fish, then carry out the movement towards it
@@ -103,16 +108,16 @@ public class FishAIController : MonoBehaviour
         perceptionInteraction.RemoveBobber();
         if (bobber != null) bobber.IsClaimed = false;
 
-        boid.IsRoaming = true;
-        activeCoroutine = null;
+        boid.IsLingering = false;
+        StopActiveRoutine(true);
     }
-
 
     IEnumerator FollowBobberRoutine(BobberBehaviour bobber)
     {
         boid.IsRoaming = false;
+        boid.IsLingering = true;
 
-        float followSpeed = 10f;
+        float followSpeed = 25f;
         float rotationSpeed = 5f;
 
         while (bobber != null && bobber.HookPoint != null)
@@ -126,13 +131,14 @@ public class FishAIController : MonoBehaviour
             yield return null;
         }
 
-        boid.IsRoaming = true;
-        activeCoroutine = null;
+        boid.IsLingering = false;
+        StopActiveRoutine(true);
     }
 
     IEnumerator NibbleRoutine(Transform hookPoint, BobberBehaviour bobber)
     {
         boid.IsRoaming = false;
+        boid.IsLingering = true;
 
         if (remainingNibbles <= 0)
         {
@@ -141,30 +147,36 @@ public class FishAIController : MonoBehaviour
             yield break;
         }
 
-        int maxBites = Random.Range(2, 5); //random value between 2 and 5(exclusive) that the fish will attempt to nibble at the hook
+        int maxBites = Random.Range(2, 6); //random value between 2 and 5(exclusive) that the fish will attempt to nibble at the hook
         int currentBites = 0;
-        float biteInterval = Random.Range(0.5f, 3f); //random amount of time that the nibble will happen between .5 and 3(exclusive) seconds
+        float biteInterval = Random.Range(0.2f, 0.5f); //random amount of time that the nibble will happen between .5 and 3(exclusive) seconds
 
         while (currentBites < maxBites && hookPoint != null)
         {
+            Vector3 driftAway = -transform.forward * 0.5f;
+            Vector3 driftTarget = transform.position + driftAway;
+
             float time = 0f;
-            Vector3 offset = Random.insideUnitSphere * 0.2f;
-            Vector3 startPosition = transform.position;
-            Vector3 targetPositon = hookPoint.position + offset;
 
             while (time < 1f)
             {
-                time += Time.deltaTime * 2f;
+                time += Time.deltaTime * 0.5f;
+                transform.position = Vector3.Lerp(transform.position, driftTarget, time);
+                yield return null;
+            }
 
-                transform.position = Vector3.Lerp(startPosition, targetPositon, time); //enact nibbling behaviour
-                Vector3 direction = (targetPositon - transform.position).normalized;
+            Vector3 biteTarget = hookPoint.position + Random.insideUnitSphere * 0.1f;
+            time = 0f;
 
-                if (direction != Vector3.zero)
-                {
-                    Quaternion targetRotation = Quaternion.LookRotation(direction, Vector3.up);
-                    transform.rotation = Quaternion.SlerpUnclamped(transform.rotation, targetRotation, Time.deltaTime * 5f);
-                }
-
+            while (time < 1f)
+            {
+                time += Time.deltaTime * 4f;
+                transform.position = Vector3.Lerp(driftTarget, biteTarget, time);
+                transform.rotation = Quaternion.SlerpUnclamped(
+                    transform.rotation,
+                    Quaternion.LookRotation(biteTarget - transform.position),
+                    Time.deltaTime * 8f
+                );
                 yield return null;
             }
 
@@ -173,11 +185,12 @@ public class FishAIController : MonoBehaviour
             fishStats.ModifyHunger(-10f);
             fishStats.ModifyCuriosity(-2f);
 
-            if (fishStats.Hunger <= 20 || Random.value > fishStats.Curiosity || remainingNibbles <= 0)
+            if (fishStats.Hunger <= 10 || Random.value > fishStats.Curiosity || remainingNibbles <= 0)
             {
                 bobber.IsClaimed = false;
                 perceptionInteraction.RemoveBobber();
-                boid.IsRoaming = true;
+                boid.IsLingering = false;
+                StopActiveRoutine(true);
                 activeCoroutine = null;
                 yield break;
             }
@@ -185,13 +198,16 @@ public class FishAIController : MonoBehaviour
             yield return new WaitForSeconds(biteInterval);
         }
 
-        if (bobber != null)
+        if (currentBites >= 2 && Random.value < 0.9f && bobber != null)
         {
             bobber.HookFish(perceptionInteraction);
+            StopActiveRoutine(false);
             perceptionInteraction.RequestFollowBobber(bobber);
+            yield break;
         }
 
-        activeCoroutine = null;
+        boid.IsLingering = false;
+        StopActiveRoutine(true);
     }
 
     IEnumerator NibbleCooldownTimer()
@@ -199,4 +215,5 @@ public class FishAIController : MonoBehaviour
         yield return new WaitForSeconds(200f);
         remainingNibbles = maximumAmountOfNibbles;
     }
+    #endregion
 }

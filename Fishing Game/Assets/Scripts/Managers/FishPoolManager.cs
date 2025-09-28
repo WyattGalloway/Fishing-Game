@@ -10,9 +10,9 @@ public class FishPoolManager : MonoBehaviour
     [SerializeField] GameObject fishPrefab; //what fish is spawned
     [SerializeField] Collider lakeCollider; //the bounding box the fish can spawn in
     [SerializeField] FishDatabase fishDatabase; //references the fish database
+    [SerializeField] float clusterRadius = 5f;
 
-    [Header("Fish in the pool")]
-    List<GameObject> fishPool = new List<GameObject>();
+    List<GameObject> fishPool = new();
 
     void Start()
     {   
@@ -25,9 +25,44 @@ public class FishPoolManager : MonoBehaviour
             fishPool.Add(fish); //add it to the list
         }
 
-        SpawnAllFish();
+        SpawnFishInClusters();
     }
 
+    void SpawnFishInClusters()
+    {
+        FishBoidBehaviour.FishGroup clusterGroup = new();
+        int clusterSize = Random.Range(10, 50);
+
+        int i = 0;
+        while (i < fishPool.Count)
+        {
+            Vector3 anchorSpawn = GetRandomPointInLake(lakeCollider, 10);
+
+            for (int j = 0; j < clusterSize && i < fishPool.Count; j++, i++)
+            {
+                GameObject fish = fishPool[i];
+                Vector3 spawnPosition = anchorSpawn + Random.insideUnitSphere * clusterRadius;
+
+                fish.transform.position = spawnPosition;
+
+                FishDataSO fishData = fishDatabase.GetRandomFish();
+
+                if (fish.TryGetComponent(out FishBoidBehaviour boid))
+                {
+                    boid.Initialize(lakeCollider, fishData, clusterGroup);
+                    clusterGroup.members.Add(boid);
+                }
+                    
+
+                if (fish.TryGetComponent(out FishPerceptionInteraction perceptionInteraction))
+                    perceptionInteraction.GetComponent<FishStats>().Initialize(fishData);
+
+                fish.SetActive(true);
+            }
+        }
+    }
+
+    /*
     void SpawnAllFish()
     {
         //loops through all the fish in the list
@@ -48,6 +83,7 @@ public class FishPoolManager : MonoBehaviour
             fish.SetActive(true); //activate the fish in the list
         }
     }
+    */
 
     Vector3 GetRandomPointInLake(Collider lakeCollider, int maxAttempts = 10)
     {

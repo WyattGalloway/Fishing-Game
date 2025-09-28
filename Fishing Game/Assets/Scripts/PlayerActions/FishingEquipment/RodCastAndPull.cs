@@ -135,7 +135,7 @@ public class RodCastAndPull : FishingEquipmentBase
 
     void CollectFishAndBobber()
     {
-        if (bobber != null && isPulling && Vector3.Distance(bobber.transform.position, transform.position) < 2.5f)
+        if (bobber != null && isPulling && Vector3.Distance(bobber.transform.position, transform.position) < 4f)
         {
             Debug.Log("Bobber retrieved!");
             Destroy(bobber);

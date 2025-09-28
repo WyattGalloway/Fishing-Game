@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class FishBoidBehaviour : MonoBehaviour
@@ -20,80 +21,86 @@ public class FishBoidBehaviour : MonoBehaviour
     public FishDataSO data; //data the fish need to be set. Name, weight, etc.
     public float currentWeight { get; private set; } //can set the weight of each fish
 
+    public FishGroup group;
+
     List<Transform> neighbors = new(); //list of neighbors fish will separate from
+    Vector3 moveDirection;
 
     public bool IsRoaming { get; set; } = true;
+    public bool IsLingering { get; set; } = false;
 
-    void Update()
+    void FixedUpdate()
+    {
+        if (!IsRoaming)
+        {
+            IsLingering = true;
+            moveDirection = Vector3.zero;
+            transform.position += moveDirection;
+            return;
+        }
+        else if (IsRoaming && !IsLingering)
+        {
+            Boid();
+        }
+    }
+
+    void Boid()
     {
         FindNeighbors();
 
-        Vector3 move = Vector3.zero;
+        Vector3 separation = CalculateSeparation();
+        Vector3 cohesion = CalculateCohesion();
+        Vector3 alignment = CalculateAlignment();
 
-        //ensures fish dont stay static if no neighbors are found
-        Vector3 wander = new Vector3(
-            Mathf.PerlinNoise(Time.time * 0.5f, transform.position.x) - 0.5f,
-            Mathf.PerlinNoise(Time.time * 0.5f, transform.position.y) - 0.5f,
-            Mathf.PerlinNoise(Time.time * 0.5f, transform.position.z) - 0.5f
-        );
+        Vector3 localMove = separation + cohesion + alignment;
 
-        wander = wander.normalized * 0.5f;
-
-        if (IsRoaming)
-            move += wander;
-
-        //starts boid when neighbors are present
-        if (neighbors.Count > 0)
+        if (group != null)
         {
-            Vector3 separation = CalculateSeparation();
-            Vector3 alignment = CalculateAlignment();
-            Vector3 cohesion = CalculateCohesion();
+            group.UpdateGroupAvoidance(lakeColllider);
 
-            move = separation + alignment + cohesion;
-            IsRoaming = false;
+            localMove = Vector3.Lerp(localMove, group.groupAvoidance * moveSpeed, 0.5f);
         }
 
-        //avoid the bounds to prevent clumping on the edges
-        move += CalculateBoundsAvoidance();
+        if (localMove.magnitude < 0.01f)
+            localMove = transform.forward;
 
-        //moves fish forward if they havent moved yet
-        if (move.magnitude < 0.01f)
-            move = transform.forward;
+        moveDirection = localMove.normalized;
+        transform.position += moveDirection * moveSpeed * Time.deltaTime;
+        transform.forward = Vector3.Slerp(transform.forward, moveDirection, Time.deltaTime * 5f);
 
-        move = move.normalized * moveSpeed;
-        
-        //Adds all previous instructions of move to the position to move the fish
-        transform.position += move * Time.deltaTime;
-        transform.position = ClampToBounds(transform.position); //ensures fish dont leave bounds
-        
-        //ensures the forward is inline with all other fish
-        if (move != Vector3.zero && IsRoaming)
-        {
-            transform.forward = Vector3.Lerp(transform.forward, move.normalized, Time.deltaTime * 5f);
-        }
+        transform.position = ClampToBounds(transform.position);
     }
 
-    public void Initialize(Collider lake, FishDataSO fishData)
+    public void Initialize(Collider lake, FishDataSO data, FishGroup fishGroup)
     {
-        //initializes the data the fish need, since theyre prefabs and cant be assigned in inspector
         lakeColllider = lake;
-        data = fishData;
-        currentWeight = Random.Range(data.weightRange.x, data.weightRange.y);
+        this.data = data;
+        group = fishGroup;
+        moveDirection = transform.forward;
+
+        transform.rotation = Quaternion.Euler(
+            Random.Range(0f, 360f),
+            Random.Range(0f, 360f),
+            Random.Range(0f, 360f)
+        );
     }
 
+    void OnDisable()
+    {
+        if (group != null)
+            group.members.Remove(this);
+    }
+
+    #region Boid Behaviours
     void FindNeighbors()
     {
-        neighbors.Clear(); //clear list to ensure no overlap
+        neighbors.Clear();
 
-        Collider[] nearbyNeighbors = Physics.OverlapSphere(transform.position, separationRadius);
-
-        //takes the collider array and adds fish in the collider to the neighbor list
-        foreach (Collider col in nearbyNeighbors)
+        Collider[] nearby = Physics.OverlapSphere(transform.position, separationRadius);
+        foreach (Collider collider in nearby)
         {
-            if (col.gameObject != gameObject && col.CompareTag("Fish")) //TODO: change fish to fish of same type
-            {
-                neighbors.Add(col.transform);
-            }
+            if (collider.gameObject != gameObject && collider.CompareTag("Fish"))
+                neighbors.Add(collider.transform);
         }
     }
 
@@ -102,20 +109,14 @@ public class FishBoidBehaviour : MonoBehaviour
         if (neighbors.Count == 0) return Vector3.zero;
 
         Vector3 separationDirection = Vector3.zero;
-
-        //gets the distance from the neighbor and ensures the fish are an appropriate distance
         foreach (Transform neighbor in neighbors)
         {
-            Vector3 separation = transform.position - neighbor.transform.position;
-            float distance = separation.magnitude;
-
+            Vector3 diff = transform.position - neighbor.position;
+            float distance = diff.magnitude;
             if (distance > 0 && distance < separationDistance)
-            {
-                separationDirection += separation.normalized / distance;
-            }
+                separationDirection += diff.normalized / distance;
         }
 
-        //return the separation direction and ensures that the fish are separated by force
         return separationDirection.normalized * separationForce;
     }
 
@@ -123,82 +124,94 @@ public class FishBoidBehaviour : MonoBehaviour
     {
         if (neighbors.Count == 0) return Vector3.zero;
 
-        Vector3 averageDirection = Vector3.zero;
-
-        //ensures each fish goes in the same direction
+        Vector3 averageForward = Vector3.zero;
         foreach (Transform neighbor in neighbors)
-        {
-            averageDirection += neighbor.forward;
-        }
+            averageForward += neighbor.forward;
 
-        averageDirection /= neighbors.Count; //averages out the direction by the count of neightbors
-
-        return averageDirection.normalized * alignmentForce;
+        averageForward /= neighbors.Count;
+        return averageForward.normalized * alignmentForce;
     }
 
     Vector3 CalculateCohesion()
     {
         if (neighbors.Count == 0) return Vector3.zero;
 
-        Vector3 centerOfMass = Vector3.zero;
-
-        //makes each fish clump have its own center of mass
+        Vector3 center = Vector3.zero;
         foreach (Transform neighbor in neighbors)
-        {
-            centerOfMass += neighbor.position;
-        }
+            center += neighbor.position;
 
-        centerOfMass /= neighbors.Count; //average out the center of mass between all neighbors
-
-        Vector3 cohesionDirection = (centerOfMass - transform.position).normalized;
-
+        center /= neighbors.Count;
+        Vector3 cohesionDirection = (center - transform.position).normalized;
         return cohesionDirection * cohesionForce;
     }
+    #endregion
 
-    Vector3 CalculateBoundsAvoidance()
+    #region Boundary Helpers
+    public bool IsNearBounds()
     {
-        if (lakeColllider == null) return Vector3.zero;
-
-        Bounds bounds = lakeColllider.bounds;
-        Vector3 avoidance = Vector3.zero;
-
-        float buffer = avoidanceBuffer;
+        if (lakeColllider == null) return false;
 
         Vector3 pos = transform.position;
-        // gets the x,y,z of each fish and calculates its avoidance based off its proximity to the bounds of the swimming area
-        // X-axis
-        if (pos.x < bounds.min.x + buffer)
-            avoidance += Vector3.right * (1f - (pos.x - bounds.min.x) / buffer);
-        else if (pos.x > bounds.max.x - buffer)
-            avoidance += Vector3.left * (1f - (bounds.max.x - pos.x) / buffer);
-
-        // Y-axis
-        if (pos.y < bounds.min.y + buffer)
-            avoidance += Vector3.up * (1f - (pos.y - bounds.min.y) / buffer);
-        else if (pos.y > bounds.max.y - buffer)
-            avoidance += Vector3.down * (1f - (bounds.max.y - pos.y) / buffer);
-
-        // Z-axis
-        if (pos.z < bounds.min.z + buffer)
-            avoidance += Vector3.forward * (1f - (pos.z - bounds.min.z) / buffer);
-        else if (pos.z > bounds.max.z - buffer)
-            avoidance += Vector3.back * (1f - (bounds.max.z - pos.z) / buffer);
-
-        return avoidance.normalized * avoidanceStrength;
-    }
-
-
-    Vector3 ClampToBounds(Vector3 position)
-    {
-        if (lakeColllider == null) return position;
-
         Bounds bounds = lakeColllider.bounds;
 
-        //ensure the fish dont leave the bounds of the lake by clamping x,y,z
-        position.x = Mathf.Clamp(position.x, bounds.min.x, bounds.max.x);
-        position.y = Mathf.Clamp(position.y, bounds.min.y, bounds.max.y);
-        position.z = Mathf.Clamp(position.z, bounds.min.z, bounds.max.z);
-
-        return position;
+        return pos.x < bounds.min.x + avoidanceBuffer || pos.x > bounds.max.x + avoidanceBuffer ||
+               pos.y < bounds.min.y + avoidanceBuffer || pos.y > bounds.max.y + avoidanceBuffer ||
+               pos.z < bounds.min.z + avoidanceBuffer || pos.z > bounds.max.z + avoidanceBuffer;
     }
+
+    public Vector3 GetBoundaryNormal()
+    {
+        Vector3 normal = Vector3.zero;
+        Vector3 position = transform.position;
+        Bounds bounds = lakeColllider.bounds;
+
+        if (position.x < bounds.min.x) normal += Vector3.right;
+        else if (position.x > bounds.max.x) normal += Vector3.left;
+
+        if (position.y < bounds.min.y) normal += Vector3.right;
+        else if (position.y > bounds.max.y) normal += Vector3.left;
+
+        if (position.z < bounds.min.z) normal += Vector3.right;
+        else if (position.z > bounds.max.z) normal += Vector3.left;
+
+        return normal.normalized;
+    }
+
+    Vector3 ClampToBounds(Vector3 pos)
+    {
+        if (lakeColllider == null) return pos;
+
+        Bounds bounds = lakeColllider.bounds;
+        pos.x = Mathf.Clamp(pos.x, bounds.min.x, bounds.max.x);
+        pos.y = Mathf.Clamp(pos.y, bounds.min.y, bounds.max.y);
+        pos.z = Mathf.Clamp(pos.z, bounds.min.z, bounds.max.z);
+
+        return pos;
+    }
+    #endregion
+
+    [System.Serializable]
+    public class FishGroup
+    {
+        public List<FishBoidBehaviour> members = new();
+        public Vector3 groupAvoidance = Vector3.zero;
+
+        public void UpdateGroupAvoidance(Collider lake)
+        {
+            Vector3 avoidanceSum = Vector3.zero;
+            int count = 0;
+
+            foreach (var fish in members)
+            {
+                if (fish.IsNearBounds())
+                {
+                    avoidanceSum += -fish.transform.forward;
+                    count++;
+                }
+            }
+
+            groupAvoidance = count > 0 ? (avoidanceSum / count).normalized : Vector3.zero;
+        }
+    }
+
 }
