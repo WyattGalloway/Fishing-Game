@@ -42,6 +42,9 @@ public class BobberBehaviour : MonoBehaviour
         {
             indicator.SetActive(true);
 
+            float yOffset = Mathf.Sin(Time.time * 2f) * 0.1f;
+            transform.position = new Vector3(transform.position.x, transform.position.y + yOffset, transform.position.z);
+
             if (!isFishing)
             {
                 isFishing = true;

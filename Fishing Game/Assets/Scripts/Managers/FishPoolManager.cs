@@ -8,7 +8,8 @@ public class FishPoolManager : MonoBehaviour
 
     [Header("References")]
     [SerializeField] GameObject fishPrefab; //what fish is spawned
-    [SerializeField] Collider lakeCollider; //the bounding box the fish can spawn in
+    [SerializeField] Collider lakeCollider; //the total spawn area of the lake
+    [SerializeField] Collider spawnArea; //the spawn area of the pool
     [SerializeField] FishDatabase fishDatabase; //references the fish database
     [SerializeField] float clusterRadius = 5f;
 
@@ -31,17 +32,21 @@ public class FishPoolManager : MonoBehaviour
     void SpawnFishInClusters()
     {
         FishBoidBehaviour.FishGroup clusterGroup = new();
-        int clusterSize = Random.Range(10, 50);
+        int clusterSize = Random.Range(10, poolSize);
 
         int i = 0;
         while (i < fishPool.Count)
         {
-            Vector3 anchorSpawn = GetRandomPointInLake(lakeCollider, 10);
+            Vector3 lakeSpawn = GetRandomPointInLake(lakeCollider, 10);
+            Vector3 spawnAreaSpawn = SpawnAtPoint(spawnArea, 10);
 
             for (int j = 0; j < clusterSize && i < fishPool.Count; j++, i++)
             {
                 GameObject fish = fishPool[i];
-                Vector3 spawnPosition = anchorSpawn + Random.insideUnitSphere * clusterRadius;
+                Vector3 spawnPosition = Vector3.zero;
+
+                if (j > clusterSize && i < fishPool.Count) spawnPosition = lakeSpawn + Random.insideUnitSphere * clusterRadius;
+                else spawnPosition = spawnAreaSpawn + Random.insideUnitSphere * clusterRadius;
 
                 fish.transform.position = spawnPosition;
 
@@ -52,7 +57,7 @@ public class FishPoolManager : MonoBehaviour
                     boid.Initialize(lakeCollider, fishData, clusterGroup);
                     clusterGroup.members.Add(boid);
                 }
-                    
+
 
                 if (fish.TryGetComponent(out FishPerceptionInteraction perceptionInteraction))
                     perceptionInteraction.GetComponent<FishStats>().Initialize(fishData);
@@ -85,6 +90,25 @@ public class FishPoolManager : MonoBehaviour
     }
     */
 
+    Vector3 SpawnAtPoint(Collider spawnArea, int maxAttempts = 10)
+    {
+        Bounds bounds = spawnArea.bounds;
+
+        for (int i = 0; i < maxAttempts; i++)
+        {
+            Vector3 randomPoint = new Vector3(
+                Random.Range(bounds.min.x, bounds.max.x),
+                Random.Range(bounds.min.y, bounds.max.y),
+                Random.Range(bounds.min.y, bounds.max.y)
+            );
+
+            Vector3 closestPoint = spawnArea.ClosestPoint(randomPoint);
+
+            if (Vector3.Distance(closestPoint, randomPoint) < 0.01) return randomPoint;
+        }
+
+        return spawnArea.bounds.center;
+    }
     Vector3 GetRandomPointInLake(Collider lakeCollider, int maxAttempts = 10)
     {
         Bounds bounds = lakeCollider.bounds;

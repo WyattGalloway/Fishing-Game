@@ -77,12 +77,6 @@ public class FishBoidBehaviour : MonoBehaviour
         this.data = data;
         group = fishGroup;
         moveDirection = transform.forward;
-
-        transform.rotation = Quaternion.Euler(
-            Random.Range(0f, 360f),
-            Random.Range(0f, 360f),
-            Random.Range(0f, 360f)
-        );
     }
 
     void OnDisable()
