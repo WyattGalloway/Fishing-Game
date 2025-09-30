@@ -1504,6 +1504,7 @@ MonoBehaviour:
   deceleration: 2
   rb: {fileID: 676625853}
   staminaBar: {fileID: 542756136}
+  mainCam: {fileID: 1414436235}
 --- !u!114 &676625852
 MonoBehaviour:
   m_ObjectHideFlags: 0
